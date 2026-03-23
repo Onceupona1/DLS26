@@ -3,161 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DLS 26 | EPL League Dashboard</title>
+    <title>DLS 26 | Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        // Security check
         if (localStorage.getItem("isLoggedIn") !== "true") { window.location.href = "login.html"; }
     </script>
     <style>
         .glass-card { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
-        .player-row-highlight { background: rgba(59, 130, 246, 0.15); border-left: 4px solid #3b82f6; }
     </style>
 </head>
 <body class="bg-[#020617] text-slate-200 min-h-screen pb-20">
 
     <nav class="max-w-6xl mx-auto p-6 flex justify-between items-center">
-        <h1 class="text-xl font-black tracking-tighter text-white">DLS<span class="text-blue-500">26</span> PRO</h1>
-        <div class="flex items-center gap-4">
-            <span id="nav-player-name" class="text-sm font-medium text-slate-400"></span>
-            <button onclick="localStorage.clear(); window.location.href='index.html'" class="text-xs bg-red-500/10 text-red-500 px-3 py-1 rounded-full hover:bg-red-500 hover:text-white transition">Logout</button>
-        </div>
+        <h1 class="text-xl font-black tracking-tighter text-white">DLS<span class="text-blue-500">26</span> DASHBOARD</h1>
+        <button onclick="localStorage.clear(); window.location.href='index.html'" class="text-xs bg-red-500/10 text-red-500 px-4 py-2 rounded-full font-bold">LOGOUT</button>
     </nav>
 
-    <main class="max-w-5xl mx-auto px-6 space-y-10">
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="glass-card p-6 rounded-3xl text-center md:text-left">
-                <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-1">Your Status</p>
-                <p id="dash-status" class="text-xl font-bold text-white">Loading...</p>
-            </div>
-            <div class="glass-card p-6 rounded-3xl text-center md:text-left">
-                <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-1">Current Matchday</p>
-                <p class="text-xl font-bold text-blue-400">Gameweek 1</p>
-            </div>
-            <div class="glass-card p-6 rounded-3xl text-center md:text-left">
-                <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-1">Tournament Type</p>
-                <p class="text-xl font-bold text-white">EPL Style League</p>
-            </div>
+    <main class="max-w-4xl mx-auto px-6 space-y-8">
+        <div class="glass-card p-8 rounded-[2rem] border-l-4 border-blue-500">
+            <h2 class="text-slate-400 text-xs uppercase tracking-widest font-bold mb-1">Welcome Back</h2>
+            <p id="nav-player-name" class="text-3xl font-black text-white"></p>
         </div>
 
-        <section class="glass-card rounded-[2rem] overflow-hidden">
-            <div class="p-6 border-b border-white/5 bg-white/5 flex justify-between items-center">
-                <h2 class="font-bold text-lg text-white">League Standings</h2>
-                <span class="text-[10px] bg-blue-600 px-2 py-1 rounded text-white font-bold uppercase">Live</span>
-            </div>
-            <div class="overflow-x-auto p-4">
-                <table class="w-full text-sm text-left border-collapse">
-                    <thead>
-                        <tr class="text-slate-500 font-bold border-b border-white/5">
-                            <th class="p-3">Pos</th>
-                            <th class="p-3">Player</th>
-                            <th class="p-3">P</th>
-                            <th class="p-3">W</th>
-                            <th class="p-3">D</th>
-                            <th class="p-3">L</th>
-                            <th class="p-3">GD</th>
-                            <th class="p-3 text-blue-400">Pts</th>
-                        </tr>
-                    </thead>
-                    <tbody id="league-table-body">
-                        <tr><td colspan="8" class="text-center py-10 text-slate-600 italic animate-pulse">Connecting to League Database...</td></tr>
-                    </tbody>
-                </table>
-            </div>
+        <section class="bg-blue-600 p-8 rounded-[2rem] shadow-xl shadow-blue-900/20">
+            <h2 class="text-xl font-black text-white mb-4">Submit Match Result</h2>
+            <form id="result-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="text" id="opp-name" placeholder="Opponent Name" required class="bg-slate-900/50 p-4 rounded-xl outline-none text-white border border-blue-400/30">
+                <input type="text" id="ss-link" placeholder="Screenshot Link" required class="bg-slate-900/50 p-4 rounded-xl outline-none text-white border border-blue-400/30">
+                <div class="flex gap-2">
+                    <input type="number" id="my-score" placeholder="My Score" required class="w-1/2 bg-slate-900/50 p-4 rounded-xl text-center border border-blue-400/30">
+                    <input type="number" id="opp-score" placeholder="Opp Score" required class="w-1/2 bg-slate-900/50 p-4 rounded-xl text-center border border-blue-400/30">
+                </div>
+                <button type="submit" id="submit-btn" class="bg-white text-blue-600 font-black rounded-xl py-4 hover:bg-slate-100 transition">SUBMIT TO ADMIN</button>
+            </form>
         </section>
 
-        <section class="bg-blue-600/10 border border-blue-500/20 rounded-[2rem] p-8">
-            <div class="max-w-xl mx-auto text-center mb-8">
-                <h2 class="text-2xl font-bold text-white">Submit Match Result</h2>
-                <p class="text-slate-400 text-sm">Results will appear in standings once verified by Admin.</p>
+        <section class="glass-card rounded-[2rem] p-6 overflow-hidden">
+            <h3 class="font-bold text-white mb-4">Current Standings</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead>
+                        <tr class="text-slate-500 font-bold border-b border-white/5">
+                            <th class="p-3">Pos</th><th class="p-3">Player</th><th class="p-3">P</th><th class="p-3">GD</th><th class="p-3 text-blue-400">Pts</th>
+                        </tr>
+                    </thead>
+                    <tbody id="league-table-body"></tbody>
+                </table>
             </div>
-
-            <form id="result-form" class="max-w-2xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input type="text" id="opp-name" placeholder="Opponent Name" required class="w-full bg-slate-950 p-4 rounded-2xl border border-slate-800 outline-none focus:border-blue-500 text-white">
-                <input type="text" id="ss-link" placeholder="Screenshot Link (Imgur/Drive)" required class="w-full bg-slate-950 p-4 rounded-2xl border border-slate-800 outline-none focus:border-blue-500 text-white">
-                <div class="flex gap-2">
-                    <input type="number" id="my-score" placeholder="Your Score" required class="w-1/2 bg-slate-950 p-4 rounded-2xl border border-slate-800 outline-none focus:border-blue-500 text-white text-center">
-                    <input type="number" id="opp-score" placeholder="Opp Score" required class="w-1/2 bg-slate-950 p-4 rounded-2xl border border-slate-800 outline-none focus:border-blue-500 text-white text-center">
-                </div>
-                <button type="submit" id="submit-btn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black rounded-2xl transition-all shadow-lg shadow-blue-900/30 py-4 uppercase">Submit Result</button>
-            </form>
         </section>
     </main>
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHtvLu74wApqPjqoNAp13cCTaFIhmnM5wzvOiwL0-Fwq3Jxm18xa5mWrLLeDJDFujF/exec";
-        const CURRENT_PLAYER = localStorage.getItem('playerName');
+        document.getElementById('nav-player-name').innerText = localStorage.getItem('playerName');
 
-        // Initialize UI
-        document.getElementById('nav-player-name').innerText = CURRENT_PLAYER;
-        document.getElementById('dash-status').innerText = localStorage.getItem('playerStatus');
-
-        // Fetch and Map League Data
         async function loadTable() {
-            try {
-                const res = await fetch(SCRIPT_URL);
-                const data = await res.json();
-                const tbody = document.getElementById('league-table-body');
-                tbody.innerHTML = ""; 
-
-                data.forEach((player, index) => {
-                    const isMe = (player[0] === CURRENT_PLAYER);
-                    
-                    // Column Mapping: A=0, E=4, F=5, G=6, H=7, I=8, J=9
-                    const row = `
-                        <tr class="border-t border-white/5 transition ${isMe ? 'player-row-highlight' : 'hover:bg-white/5'}">
-                            <td class="p-3 font-mono text-slate-500">${index + 1}</td>
-                            <td class="p-3 font-bold text-white">${player[0] || "Unknown"} ${isMe ? '<span class="text-[8px] ml-1 bg-blue-500 text-white px-1 rounded">YOU</span>' : ''}</td>
-                            <td class="p-3">${player[4] || 0}</td>
-                            <td class="p-3">${player[5] || 0}</td>
-                            <td class="p-3">${player[6] || 0}</td>
-                            <td class="p-3">${player[7] || 0}</td>
-                            <td class="p-3 ${player[8] < 0 ? 'text-red-400' : 'text-slate-400'}">${player[8] || 0}</td>
-                            <td class="p-3 font-bold text-blue-400">${player[9] || 0}</td>
-                        </tr>`;
-                    tbody.innerHTML += row;
-                });
-            } catch (err) { 
-                console.error("Table Error:", err); 
-                document.getElementById('league-table-body').innerHTML = '<tr><td colspan="8" class="text-center py-10 text-red-500">Failed to load rankings.</td></tr>';
-            }
+            const res = await fetch(SCRIPT_URL);
+            const data = await res.json();
+            const me = localStorage.getItem('playerName');
+            document.getElementById('league-table-body').innerHTML = data.map((p, i) => `
+                <tr class="border-t border-white/5 ${p[0] === me ? 'bg-blue-500/10' : ''}">
+                    <td class="p-3 font-mono">${i+1}</td>
+                    <td class="p-3 font-bold text-white">${p[0]} ${p[0] === me ? '⭐' : ''}</td>
+                    <td class="p-3">${p[4] || 0}</td><td class="p-3">${p[8] || 0}</td>
+                    <td class="p-3 font-bold text-blue-400">${p[9] || 0}</td>
+                </tr>
+            `).join('');
         }
         
-        loadTable();
-
-        // Handle Result Submission
-        document.getElementById('result-form').onsubmit = async function(e) {
+        document.getElementById('result-form').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submit-btn');
-            btn.disabled = true; 
-            btn.innerText = "Processing...";
-
-            const payload = {
-                action: "submitResult",
-                playerName: CURRENT_PLAYER,
-                opponent: document.getElementById('opp-name').value,
-                myScore: document.getElementById('my-score').value,
-                oppScore: document.getElementById('opp-score').value,
-                ssLink: document.getElementById('ss-link').value
-            };
-
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(payload)
-                });
-                
-                alert("Match submitted successfully! It will appear on the table once the admin verifies the screenshot.");
-                document.getElementById('result-form').reset();
-            } catch (err) {
-                alert("Submission failed. Check your connection.");
-                console.error(err);
-            } finally {
-                btn.disabled = false; 
-                btn.innerText = "Submit Result";
-            }
+            btn.innerText = "Sending..."; btn.disabled = true;
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: "submitResult",
+                    playerName: localStorage.getItem('playerName'),
+                    opponent: document.getElementById('opp-name').value,
+                    myScore: document.getElementById('my-score').value,
+                    oppScore: document.getElementById('opp-score').value,
+                    ssLink: document.getElementById('ss-link').value
+                })
+            });
+            alert("Sent! Admin will verify soon.");
+            btn.innerText = "SUBMIT TO ADMIN"; btn.disabled = false;
         };
+        loadTable();
     </script>
 </body>
 </html>
