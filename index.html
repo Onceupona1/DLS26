@@ -11,7 +11,34 @@
     </style>
 </head>
 <body class="bg-[#020617] text-slate-200 min-h-screen">
+<script>
+  const WEB_APP_URL = "YOUR_DEPLOYED_WEB_APP_URL_HERE"; 
 
+  async function loadLeagueTable() {
+    try {
+      const response = await fetch(WEB_APP_URL);
+      const data = await response.json();
+      
+      const tableBody = document.querySelector("#league-table-body");
+      if (!tableBody) return;
+
+      // This is the mapping we discussed to fix the Names and Scores
+      const rows = data.map((item, index) => {
+        return `
+          <tr>
+            <td>${index + 1}</td>              <td>${item[0] || "No Name"}</td>   <td>${item[4] || 0}</td>           <td>${item[5] || 0}</td>           <td>${item[6] || 0}</td>           <td>${item[7] || 0}</td>           <td>${item[8] || 0}</td>           <td><strong>${item[9] || 0}</strong></td> </tr>
+        `;
+      }).join('');
+
+      tableBody.innerHTML = rows;
+    } catch (error) {
+      console.error("Error loading standings:", error);
+    }
+  }
+
+  // Load the data immediately when the page opens
+  window.onload = loadLeagueTable;
+</script>
     <nav class="max-w-7xl mx-auto p-6 flex justify-between items-center relative z-10">
         <h1 class="text-2xl font-black tracking-tighter text-white uppercase">DLS<span class="text-blue-500">26</span> PRO</h1>
     </nav>
