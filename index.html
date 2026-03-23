@@ -8,95 +8,110 @@
     <style>
         .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); }
         .hero-gradient { background: radial-gradient(circle at 50% 50%, rgba(37, 99, 235, 0.1) 0%, transparent 50%); }
+        tr { border-bottom: 1px solid rgba(30, 41, 59, 0.5); }
+        tr:last-child { border-bottom: none; }
+        td { padding: 12px 8px; }
     </style>
 </head>
 <body class="bg-[#020617] text-slate-200 min-h-screen">
-<script>
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzHtvLu74wApqPjqoNAp13cCTaFIhmnM5wzvOiwL0-Fwq3Jxm18xa5mWrLLeDJDFujF/exec"; 
 
-  async function loadLeagueTable() {
-    try {
-      const response = await fetch(WEB_APP_URL);
-      const data = await response.json();
-      
-      const tableBody = document.querySelector("#league-table-body");
-      if (!tableBody) return;
-
-      // This is the mapping we discussed to fix the Names and Scores
-      const rows = data.map((item, index) => {
-        return `
-          <tr>
-            <td>${index + 1}</td>              <td>${item[0] || "No Name"}</td>   <td>${item[4] || 0}</td>           <td>${item[5] || 0}</td>           <td>${item[6] || 0}</td>           <td>${item[7] || 0}</td>           <td>${item[8] || 0}</td>           <td><strong>${item[9] || 0}</strong></td> </tr>
-        `;
-      }).join('');
-
-      tableBody.innerHTML = rows;
-    } catch (error) {
-      console.error("Error loading standings:", error);
-    }
-  }
-
-  // Load the data immediately when the page opens
-  window.onload = loadLeagueTable;
-</script>
     <nav class="max-w-7xl mx-auto p-6 flex justify-between items-center relative z-10">
         <h1 class="text-2xl font-black tracking-tighter text-white uppercase">DLS<span class="text-blue-500">26</span> PRO</h1>
+        <div class="flex gap-4">
+            <a href="login.html" class="text-xs font-bold hover:text-blue-400 transition">LOGOUT</a>
+        </div>
     </nav>
 
-    <main class="relative pt-20 pb-32 px-6 overflow-hidden">
+    <main class="relative pt-10 pb-32 px-6 overflow-hidden">
         <div class="hero-gradient absolute inset-0 -z-10"></div>
         
-        <div class="max-w-4xl mx-auto text-center">
+        <div class="max-w-5xl mx-auto text-center">
             <div class="inline-flex items-center gap-2 bg-slate-800/50 border border-slate-700/50 px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest text-blue-400 mb-8">
                 <span class="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
-                Season 1 Registration Live
+                Season 1 Live Standings
             </div>
 
-            <h1 class="text-5xl md:text-7xl font-black text-white mb-6 tracking-tight leading-tight">
-                The Ultimate <br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">DLS Pro League</span>
+            <h1 class="text-4xl md:text-6xl font-black text-white mb-6 tracking-tight">
+                The Official <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">Pro Leaderboard</span>
             </h1>
-            
-            <p class="text-lg text-slate-400 max-w-2xl mx-auto mb-12 leading-relaxed">
-                Experience the first professional DLS league in an EPL-style format. 
-                Earn points for every win, climb the live table, and compete for the ultimate championship.
-            </p>
 
-            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20">
-                <a href="https://paystack.shop/pay/h83gp0tvg6" class="w-full sm:w-auto bg-white text-black px-8 py-4 rounded-2xl font-black hover:bg-slate-200 transition">JOIN THE LEAGUE</a>
-                <a href="login.html" class="w-full sm:w-auto glass border border-slate-700 text-white px-8 py-4 rounded-2xl font-bold hover:bg-slate-800 transition">PLAYER LOGIN</a>
+            <div class="glass border border-slate-800 p-4 md:p-8 rounded-[2rem] shadow-2xl relative mt-12">
+                <div class="flex justify-between items-center mb-6 px-2">
+                    <h2 class="text-xl font-bold text-white">League Standings</h2>
+                    <span class="bg-blue-600 px-3 py-1 rounded text-[10px] font-black uppercase tracking-tighter">Live</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="text-[10px] text-slate-500 uppercase tracking-widest border-b border-slate-800">
+                                <th class="pb-4">Pos</th>
+                                <th class="pb-4">Player</th>
+                                <th class="pb-4">P</th>
+                                <th class="pb-4">W</th>
+                                <th class="pb-4">D</th>
+                                <th class="pb-4">L</th>
+                                <th class="pb-4">GD</th>
+                                <th class="pb-4 text-blue-400">Pts</th>
+                            </tr>
+                        </thead>
+                        <tbody id="league-table-body" class="text-sm font-medium">
+                            <tr>
+                                <td colspan="8" class="py-20 text-center text-slate-500 animate-pulse">
+                                    Fetching match data from servers...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <div id="register" class="glass border border-slate-800 p-8 md:p-12 rounded-[2.5rem] shadow-2xl relative">
-                <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 px-4 py-1 rounded-md text-[10px] font-black uppercase">Live Standings Preview</div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                    <div class="text-left">
-                        <h2 class="text-2xl font-bold text-white mb-4">EPL Points System</h2>
-                        <ul class="space-y-3 text-sm text-slate-400">
-                            <li class="flex items-center gap-2"><span class="text-green-500 font-bold">3 PTS</span> for every League Win</li>
-                            <li class="flex items-center gap-2"><span class="text-yellow-500 font-bold">1 PTS</span> for a hard-fought Draw</li>
-                            <li class="flex items-center gap-2"><span class="text-red-500 font-bold">0 PTS</span> for a League Loss</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="space-y-3 bg-slate-950/50 p-6 rounded-2xl border border-slate-800">
-                        <div class="flex justify-between items-center opacity-40">
-                            <span class="text-xs font-mono">01. PLAYER NAME</span>
-                            <span class="text-xs font-bold text-blue-500">00 PTS</span>
-                        </div>
-                        <div class="flex justify-between items-center opacity-40">
-                            <span class="text-xs font-mono">02. PLAYER NAME</span>
-                            <span class="text-xs font-bold text-blue-500">00 PTS</span>
-                        </div>
-                        <div class="pt-2 border-t border-slate-800 text-center">
-                            <span class="text-[10px] text-slate-600 uppercase tracking-tighter font-bold italic">Standings update after Week 1 fixtures</span>
-                        </div>
-                    </div>
-                </div>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mt-12">
+                <a href="submit-result.html" class="w-full sm:w-auto bg-blue-600 text-white px-8 py-4 rounded-2xl font-black hover:bg-blue-500 transition shadow-lg shadow-blue-500/20">SUBMIT MATCH RESULT</a>
+                <a href="fixtures.html" class="w-full sm:w-auto glass border border-slate-700 text-white px-8 py-4 rounded-2xl font-bold hover:bg-slate-800 transition">VIEW FIXTURES</a>
             </div>
         </div>
     </main>
 
+    <script>
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzHtvLu74wApqPjqoNAp13cCTaFIhmnM5wzvOiwL0-Fwq3Jxm18xa5mWrLLeDJDFujF/exec"; 
+
+        async function loadLeagueTable() {
+            try {
+                const response = await fetch(WEB_APP_URL);
+                const data = await response.json();
+                
+                const tableBody = document.querySelector("#league-table-body");
+                if (!tableBody || !data.length) {
+                    tableBody.innerHTML = '<tr><td colspan="8" class="text-center py-10">No players registered yet.</td></tr>';
+                    return;
+                }
+
+                // DATA MAPPING (Matches your Spreadsheet Columns A, E, F, G, H, I, J)
+                const rows = data.map((item, index) => {
+                    return `
+                        <tr class="hover:bg-slate-800/30 transition">
+                            <td class="text-slate-500 font-mono">${index + 1}</td>
+                            <td class="text-white font-bold">${item[0] || "Guest"}</td>
+                            <td>${item[4] || 0}</td>
+                            <td>${item[5] || 0}</td>
+                            <td>${item[6] || 0}</td>
+                            <td>${item[7] || 0}</td>
+                            <td class="${(item[8] < 0) ? 'text-red-400' : 'text-slate-400'}">${item[8] || 0}</td>
+                            <td class="text-blue-400 font-black">${item[9] || 0}</td>
+                        </tr>
+                    `;
+                }).join('');
+
+                tableBody.innerHTML = rows;
+            } catch (error) {
+                console.error("Error loading standings:", error);
+                document.querySelector("#league-table-body").innerHTML = '<tr><td colspan="8" class="text-center py-10 text-red-400">Failed to connect to Database.</td></tr>';
+            }
+        }
+
+        // Initialize on Load
+        window.onload = loadLeagueTable;
+    </script>
 </body>
 </html>
