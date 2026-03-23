@@ -3,60 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | DLS26</title>
+    <title>Dashboard | DLS26 PRO</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>if(localStorage.getItem("isLoggedIn")!=="true") window.location.href="login.html";</script>
+    <script>
+        if (localStorage.getItem("isLoggedIn") !== "true") {
+            window.location.href = "login.html";
+        }
+    </script>
 </head>
 <body class="bg-[#020617] text-slate-300 min-h-screen p-6">
     <main class="max-w-4xl mx-auto space-y-8">
         <div class="flex justify-between items-center">
             <h1 class="text-2xl font-black text-white italic">DLS<span class="text-blue-500">26</span> DASH</h1>
-            <button onclick="localStorage.clear(); location.href='index.html'" class="text-xs text-red-500 font-bold">LOGOUT</button>
+            <button onclick="localStorage.clear(); location.href='index.html'" 
+                    class="text-xs text-red-500 font-bold hover:text-red-400 transition">
+                LOGOUT
+            </button>
         </div>
 
         <div class="bg-blue-600/10 p-6 rounded-3xl border border-blue-500/20">
-            <p class="text-xs uppercase font-bold text-blue-400">Welcome</p>
-            <p id="p-name" class="text-2xl font-black text-white"></p>
+            <p class="text-xs uppercase font-bold text-blue-400">Welcome back</p>
+            <p id="p-name" class="text-2xl font-black text-white">Loading...</p>
         </div>
 
         <section id="fixtures" class="space-y-3">
-            <h2 class="font-bold text-white">Upcoming Fixtures</h2>
-            <div id="fix-list" class="grid gap-2 text-sm"></div>
+            <h2 class="font-bold text-white text-lg">Your Upcoming Fixtures</h2>
+            <div id="fix-list" class="grid gap-3 text-sm"></div>
         </section>
 
         <section class="bg-slate-900/50 p-6 rounded-3xl border border-slate-800">
-            <h2 class="font-bold text-white mb-4">League Standings</h2>
-            <table class="w-full text-left text-sm">
-                <tbody id="table-body"></tbody>
-            </table>
+            <h2 class="font-bold text-white mb-4 text-lg">Last 5 Games</h2>
+            <div id="last-games" class="space-y-3"></div>
+        </section>
+
+        <section class="bg-slate-900/50 p-6 rounded-3xl border border-slate-800">
+            <h2 class="font-bold text-white mb-4 text-lg">League Standings</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="text-xs text-slate-500 uppercase tracking-wider border-b border-slate-700">
+                            <th class="py-3 px-2">Pos</th>
+                            <th class="py-3">Player</th>
+                            <th class="py-3 text-right">PTS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
         </section>
     </main>
 
     <script>
-        const SCRIPT_URL = "PASTE_YOUR_NEW_URL_HERE";
-        const me = localStorage.getItem('playerName');
-        document.getElementById('p-name').innerText = me;
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHtvLu74wApqPjqoNAp13cCTaFIhmnM5wzvOiwL0-Fwq3Jxm18xa5mWrLLeDJDFujF/exec"; // ← confirm this is your current deployed URL
+
+        const playerName = localStorage.getItem('playerName') || "Player";
+        document.getElementById('p-name').innerText = playerName;
 
         async function loadData() {
-            const res = await fetch(SCRIPT_URL);
-            const json = await res.json();
-            
-            // FIX: Point to json.standings
-            document.getElementById('table-body').innerHTML = json.standings.map((p, i) => `
-                <tr class="border-t border-white/5 ${p[0]===me?'bg-blue-500/10 text-white font-bold':''}">
-                    <td class="py-3">${i+1}</td><td class="py-3">${p[0]}</td><td class="py-3 text-right text-blue-400">${p[9]} PTS</td>
-                </tr>
-            `).join('');
+            const fixList = document.getElementById('fix-list');
+            const lastGames = document.getElementById('last-games');
+            const tableBody = document.getElementById('table-body');
 
-            // FIX: Point to json.fixtures
-            document.getElementById('fix-list').innerHTML = json.fixtures.map(f => `
-                <div class="bg-white/5 p-4 rounded-xl flex justify-between">
-                    <span>${f[1]} <b class="text-slate-600 mx-2">VS</b> ${f[2]}</span>
-                    <span class="text-blue-500 font-bold uppercase text-[10px]">${f[3]}</span>
-                </div>
-            `).join('');
+            // Loading states
+            fixList.innerHTML = '<div class="text-center py-8 text-slate-500 italic">Loading your fixtures...</div>';
+            lastGames.innerHTML = '<div class="text-center py-8 text-slate-500 italic">Loading recent games...</div>';
+            tableBody.innerHTML = '<tr><td colspan="3" class="py-10 text-center text-slate-500 italic">Loading standings...</td></tr>';
+
+            try {
+                const res = await fetch(SCRIPT_URL + '?t=' + Date.now(), { cache: 'no-store' });
+                if (!res.ok) throw new Error('Network response was not ok');
+
+                const json = await res.json();
+
+                // 1. Your Fixtures (filter where you are home or away)
+                const fixtures = json.fixtures || [];
+                const myFixtures = fixtures.filter(f => 
+                    String(f[1]).trim() === playerName || String(f[2]).trim() === playerName
+                );
+
+                fixList.innerHTML = myFixtures.length === 0
+                    ? '<div class="text-center py-8 text-slate-500 italic">No upcoming fixtures for you yet.</div>'
+                    : myFixtures.map(f => `
+                        <div class="bg-white/5 p-4 rounded-xl flex justify-between items-center hover:bg-white/10 transition">
+                            <div class="font-medium">
+                                ${f[1]} <span class="text-slate-600 mx-2 font-bold">VS</span> ${f[2]}
+                            </div>
+                            <div class="text-blue-400 text-xs uppercase font-bold">${f[3] || 'Date TBD'}</div>
+                        </div>
+                    `).join('');
+
+                // 2. Last 5 Games (from recentResults – approved only)
+                const results = json.recentResults || [];
+                const myResults = results.filter(r => 
+                    String(r[1]).trim() === playerName || String(r[2]).trim() === playerName
+                ).slice(0, 5); // newest first, limit 5
+
+                lastGames.innerHTML = myResults.length === 0
+                    ? '<div class="text-center py-8 text-slate-500 italic">No games played yet.</div>'
+                    : myResults.map(r => {
+                        const isHome = String(r[1]).trim() === playerName;
+                        const myScore = isHome ? r[3] : r[4];
+                        const oppScore = isHome ? r[4] : r[3];
+                        const opponent = isHome ? r[2] : r[1];
+                        let resultClass = '';
+                        let resultText = '';
+                        if (myScore > oppScore) { resultText = 'W'; resultClass = 'text-green-400'; }
+                        else if (myScore === oppScore) { resultText = 'D'; resultClass = 'text-yellow-400'; }
+                        else { resultText = 'L'; resultClass = 'text-red-400'; }
+
+                        const date = new Date(r[0]).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+
+                        return `
+                            <div class="bg-white/5 p-4 rounded-xl flex justify-between items-center">
+                                <div>
+                                    <span class="font-medium">${opponent}</span>
+                                    <span class="mx-2 text-slate-500">•</span>
+                                    <span class="${resultClass} font-bold">${resultText}</span>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-mono">${myScore} - ${oppScore}</div>
+                                    <div class="text-xs text-slate-500">${date}</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                // 3. League Standings (mini)
+                const standings = json.standings || [];
+                tableBody.innerHTML = standings.length === 0
+                    ? '<tr><td colspan="3" class="py-10 text-center text-slate-500">No players registered yet.</td></tr>'
+                    : standings.map((p, i) => `
+                        <tr class="border-t border-white/5 ${p[0] === playerName ? 'bg-blue-600/20 font-semibold text-white' : ''}">
+                            <td class="py-3 px-2">${i + 1}</td>
+                            <td class="py-3">${p[0] || 'Unknown'}</td>
+                            <td class="py-3 text-right text-blue-400 font-bold">${p[9] || 0} PTS</td>
+                        </tr>
+                    `).join('');
+
+            } catch (err) {
+                console.error("Dashboard error:", err);
+                fixList.innerHTML = '<div class="text-center py-8 text-red-400">Failed to load fixtures.</div>';
+                lastGames.innerHTML = '<div class="text-center py-8 text-red-400">Failed to load recent games.</div>';
+                tableBody.innerHTML = '<tr><td colspan="3" class="py-10 text-center text-red-400">Failed to load standings.</td></tr>';
+            }
         }
+
+        // Initial load + auto-refresh
         loadData();
+        setInterval(loadData, 90000); // every 1.5 min
     </script>
 </body>
 </html>
