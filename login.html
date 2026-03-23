@@ -1,109 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Player Login | DLS Elite League</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Login • DLS 26 PRO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); }
-        .glow-btn { box-shadow: 0 0 20px rgba(37, 99, 235, 0.4); }
+        .glass {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glow-btn {
+            box-shadow: 0 0 25px rgba(37, 99, 235, 0.45);
+        }
+        .input-focus {
+            transition: all 0.25s ease;
+        }
+        .input-focus:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
     </style>
 </head>
-<body class="bg-[#020617] text-slate-200 min-h-screen flex items-center justify-center p-4">
-
-    <div class="fixed inset-0 -z-10">
-        <div class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(17,24,39,1),rgba(2,6,23,1))]"></div>
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full"></div>
+<body class="bg-[#020617] text-slate-200 min-h-screen flex items-center justify-center p-5">
+    <!-- Background gradient orb -->
+    <div class="fixed inset-0 pointer-events-none">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/5 rounded-full blur-3xl"></div>
     </div>
 
-    <div class="glass w-full max-w-md p-8 rounded-[2rem] shadow-2xl border border-slate-800">
+    <div class="glass w-full max-w-md p-8 md:p-10 rounded-3xl shadow-2xl relative z-10">
         <div class="text-center mb-10">
-            <h1 class="text-4xl font-black text-white tracking-tighter mb-2">DLS<span class="text-blue-500">26</span></h1>
-            <div class="h-1 w-12 bg-blue-500 mx-auto rounded-full mb-4"></div>
-            <p class="text-slate-400 text-sm">Enter your <b>Paystack Reference</b> to enter the portal.</p>
+            <h1 class="text-4xl md:text-5xl font-black tracking-tight mb-2">
+                DLS<span class="text-blue-500">26</span> PRO
+            </h1>
+            <div class="h-1 w-16 bg-blue-500 mx-auto rounded-full mb-5"></div>
+            <p class="text-slate-400 text-sm">
+                Enter your <strong class="text-slate-300">Paystack Transaction Reference</strong><br>
+                to access the player dashboard
+            </p>
         </div>
 
-        <div class="space-y-5">
+        <div class="space-y-6">
             <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1 mb-2">Transaction Reference</label>
-                <input type="text" id="ref-input" placeholder="T513408..." 
-                    class="w-full bg-slate-900/50 border border-slate-800 p-4 rounded-2xl outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-white font-mono placeholder:text-slate-700">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">
+                    Transaction Reference
+                </label>
+                <input 
+                    type="text" 
+                    id="ref-input"
+                    placeholder="T513408264963295"
+                    class="w-full bg-slate-900/60 border border-slate-700 p-4 rounded-2xl text-white font-mono placeholder:text-slate-600 focus:outline-none input-focus"
+                    autocomplete="off"
+                    autocapitalize="characters"
+                />
             </div>
 
-            <button onclick="checkLogin()" id="login-btn"
-                class="glow-btn w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-2xl transition-all active:scale-[0.98] flex justify-center items-center gap-2">
-                <span id="btn-text">Verify & Enter</span>
+            <button 
+                id="login-btn"
+                onclick="checkLogin()"
+                class="glow-btn w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-2xl transition-all active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-70"
+            >
+                <span id="btn-text">VERIFY & LOGIN</span>
             </button>
 
-            <p id="error-msg" class="text-red-400 text-xs text-center font-medium hidden bg-red-400/10 py-2 rounded-lg mt-4"></p>
+            <p id="error-msg" class="text-red-400 text-sm text-center font-medium hidden bg-red-900/20 py-3 rounded-xl mt-2"></p>
         </div>
 
-        <div class="mt-8 pt-6 border-t border-slate-800/50 text-center">
-            <a href="index.html" class="text-slate-500 text-xs hover:text-blue-400 transition">← Back to Registration</a>
+        <div class="mt-10 text-center text-xs text-slate-500">
+            <a href="index.html" class="hover:text-blue-400 transition">← Back to home</a>
+            <span class="mx-3">•</span>
+            <span>Don't have a reference? <a href="https://paystack.shop/pay/h83gp0tvg6" class="text-blue-400 hover:underline">Register now</a></span>
         </div>
     </div>
 
     <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHtvLu74wApqPjqoNAp13cCTaFIhmnM5wzvOiwL0-Fwq3Jxm18xa5mWrLLeDJDFujF/exec";
+
         async function checkLogin() {
             const btn = document.getElementById('login-btn');
             const btnText = document.getElementById('btn-text');
             const errorMsg = document.getElementById('error-msg');
-            const refInput = document.getElementById('ref-input').value.trim().toLowerCase();
+            const input = document.getElementById('ref-input');
 
-            if (!refInput) {
-                alert("Please type your Reference ID first.");
+            let ref = input.value.trim().toUpperCase();
+            input.value = ref; // normalize display
+
+            if (!ref) {
+                showError("Please enter your Paystack reference.");
                 return;
             }
 
-            // UI Loading State
+            // Basic Paystack reference format validation
+            if (!/^T[A-Z0-9]{10,20}$/.test(ref)) {
+                showError("Invalid format. Paystack references usually start with 'T' followed by 10–20 letters/numbers.");
+                return;
+            }
+
+            // Loading state
             btn.disabled = true;
-            btnText.innerText = "Connecting to Database...";
+            btnText.innerHTML = `
+                <svg class="animate-spin h-5 w-5 mr-2 inline" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8h8a8 8 0 01-16 0z"/>
+                </svg> Verifying...
+            `;
             errorMsg.classList.add('hidden');
 
-            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHtvLu74wApqPjqoNAp13cCTaFIhmnM5wzvOiwL0-Fwq3Jxm18xa5mWrLLeDJDFujF/exec";
-
             try {
-                const response = await fetch(SCRIPT_URL);
-                const result = await response.json();
-                
-                // PATCH: Access result.standings specifically to avoid the .find error
-                const players = result.standings;
+                const res = await fetch(SCRIPT_URL + '?t=' + Date.now(), { cache: 'no-store' });
+                if (!res.ok) throw new Error(`Server error ${res.status}`);
 
-                // Search for the player using Column C (Index 2)
+                const data = await res.json();
+                const players = data.standings || [];
+
+                if (players.length === 0) {
+                    showError("League is empty. Register first.");
+                    return;
+                }
+
                 const player = players.find(row => 
-                    row[2] && row[2].toString().trim().toLowerCase() === refInput
+                    row[2] && String(row[2]).trim().toUpperCase() === ref
                 );
 
                 if (player) {
-                    // Success: Save details to local storage
+                    // Store session
                     localStorage.setItem("isLoggedIn", "true");
-                    localStorage.setItem("playerName", player[0]); // Col A
-                    localStorage.setItem("playerRef", player[2]);  // Col C
-                    localStorage.setItem("playerStatus", player[3] || "Verified Player"); // Col D
+                    localStorage.setItem("playerName", player[0] || "Player");
+                    localStorage.setItem("playerRef", player[2]);
+                    localStorage.setItem("playerStatus", player[3] || "Verified");
 
                     btnText.innerText = "Access Granted!";
-                    window.location.href = "dashboard.html";
-                } else {
-                    showError("Reference not found. Please check and try again.");
-                }
+                    btn.classList.add('bg-green-600', 'hover:bg-green-500');
 
+                    setTimeout(() => {
+                        window.location.href = "dashboard.html";
+                    }, 900);
+                } else {
+                    showError("Reference not found in the league database. Double-check or register first.");
+                }
             } catch (err) {
-                console.error(err);
-                showError("Database connection failed. Please try again later.");
+                console.error("Login failed:", err);
+                showError("Connection issue. Please check your internet and try again.");
             } finally {
                 btn.disabled = false;
-                if(btnText.innerText !== "Access Granted!") {
-                    btnText.innerText = "Verify & Enter";
+                if (btnText.innerText !== "Access Granted!") {
+                    btnText.innerText = "VERIFY & LOGIN";
                 }
             }
         }
 
-        function showError(msg) {
-            const errorMsg = document.getElementById('error-msg');
-            errorMsg.innerText = msg;
-            errorMsg.classList.remove('hidden');
+        function showError(message) {
+            const el = document.getElementById('error-msg');
+            el.textContent = message;
+            el.classList.remove('hidden');
         }
+
+        // Clear error when user starts typing again
+        document.getElementById('ref-input').addEventListener('input', () => {
+            document.getElementById('error-msg').classList.add('hidden');
+        });
+
+        // Optional: auto-focus input
+        document.getElementById('ref-input').focus();
     </script>
 </body>
 </html>
