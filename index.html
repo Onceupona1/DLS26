@@ -1,47 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DLS 26 Tournament</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #0f172a; color: white; font-family: sans-serif; }
-        .card { background: #1e293b; border-radius: 12px; padding: 20px; border: 1px solid #334155; }
-        .btn-pay { background: #00d1b2; color: #000; font-weight: bold; transition: 0.3s; }
-        .btn-pay:hover { background: #00f0ce; transform: scale(1.05); }
-    </style>
-</head>
-<body class="min-h-screen flex flex-col items-center p-6">
+<nav class="w-full max-w-4xl flex justify-between items-center mb-8">
+    <div class="font-bold text-xl text-green-400">DLS HUB</div>
+    <a href="login.html" class="text-sm border border-slate-600 px-4 py-2 rounded hover:bg-slate-800">Player Login</a>
+</nav>
 
-    <header class="text-center mb-10">
-        <h1 class="text-4xl font-extrabold text-white mb-2">DLS 26 CHAMPIONS LEAGUE</h1>
-        <p class="text-slate-400">22 Teams | Win Big | Prove Your Skills</p>
-    </header>
-
-    <div class="card w-full max-w-md text-center shadow-2xl">
-        <h2 class="text-xl font-bold mb-4">Registration is OPEN</h2>
-        <p class="text-slate-300 mb-6 text-sm">Entry Fee: Paid via Paystack. Your spot is secured automatically after payment.</p>
-        
-        <a href="https://paystack.shop/pay/h83gp0tvg6" id="paystack-link" class="btn-pay inline-block w-full py-4 rounded-lg text-lg">
-            JOIN TOURNAMENT NOW
-        </a>
-    </div>
-
-    <div class="w-full max-w-4xl mt-12">
-        <h3 class="text-2xl font-bold mb-6 border-b border-slate-700 pb-2">Tournament Fixtures</h3>
-        
-        <div class="card min-h-[400px] flex items-center justify-center border-dashed">
-            <div class="text-center">
-                <p class="text-slate-500 italic">Fixtures will be generated once 22 teams have joined.</p>
-                <p class="text-xs text-slate-600 mt-2">Current Status: 0 / 22 Teams Registered</p>
-            </div>
-            </div>
-    </div>
-
-    <footer class="mt-20 text-slate-600 text-xs">
-        &copy; 2026 DLS Tournament Hub | Not affiliated with First Touch Games.
-    </footer>
-
-</body>
-</html>
+<div class="card w-full max-w-md text-center shadow-2xl">
+    <h2 class="text-xl font-bold mb-4">Registration Open</h2>
+    <a href="https://paystack.shop/pay/h83gp0tvg6" class="btn-pay inline-block w-full py-4 rounded-lg text-lg">
+        PAY ENTRY FEE (NGN)
+    </a>
+</div>
