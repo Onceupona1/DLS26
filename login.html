@@ -1,56 +1,116 @@
-<script>
-    async function checkLogin() {
-        // TEST 1: If you see this alert, the button works!
-        alert("Button clicked! Starting verification...");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Login | DLS Elite League</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); }
+        .glow-btn { box-shadow: 0 0 20px rgba(37, 99, 235, 0.4); }
+    </style>
+</head>
+<body class="bg-[#020617] text-slate-200 min-h-screen flex items-center justify-center p-4">
 
-        const btn = document.getElementById('login-btn');
-        const errorMsg = document.getElementById('error-msg');
-        const refInput = document.getElementById('ref-input').value.trim();
+    <div class="fixed inset-0 -z-10">
+        <div class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(17,24,39,1),rgba(2,6,23,1))]"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full"></div>
+    </div>
 
-        if (!refInput) {
-            alert("Error: You didn't type anything!");
-            showError("Please enter your reference ID.");
-            return;
-        }
+    <div class="glass w-full max-w-md p-8 rounded-[2rem] shadow-2xl border border-slate-800">
+        <div class="text-center mb-10">
+            <h1 class="text-4xl font-black text-white tracking-tighter mb-2">DLS<span class="text-blue-500">26</span></h1>
+            <div class="h-1 w-12 bg-blue-500 mx-auto rounded-full mb-4"></div>
+            <p class="text-slate-400 text-sm">Enter your <b>Paystack Reference</b> to enter the portal.</p>
+        </div>
 
-        // UPDATE THIS URL with your new deployment link
-        const SCRIPT_URL = "YOUR_NEW_DEPLOY_URL_HERE";
+        <div class="space-y-5">
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1 mb-2">Transaction Reference</label>
+                <input type="text" id="ref-input" placeholder="T438003..." 
+                    class="w-full bg-slate-900/50 border border-slate-800 p-4 rounded-2xl outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-white font-mono placeholder:text-slate-700">
+            </div>
 
-        try {
-            console.log("Fetching from:", SCRIPT_URL);
-            const response = await fetch(SCRIPT_URL);
+            <button onclick="checkLogin()" id="login-btn"
+                class="glow-btn w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-2xl transition-all active:scale-[0.98] flex justify-center items-center gap-2">
+                <span id="btn-text">Verify & Enter</span>
+            </button>
+
+            <p id="error-msg" class="text-red-400 text-xs text-center font-medium hidden bg-red-400/10 py-2 rounded-lg"></p>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-slate-800/50 text-center">
+            <a href="index.html" class="text-slate-500 text-xs hover:text-blue-400 transition">← Back to Registration</a>
+        </div>
+    </div>
+
+    <script>
+        async function checkLogin() {
+            // 1. Alert to confirm button works
+            console.log("Login sequence started...");
             
-            // TEST 2: Check if Google sent data back
-            if (!response.ok) throw new Error("Google Script refused the connection");
-            
-            const players = await response.json();
-            console.log("Players found:", players);
+            const btn = document.getElementById('login-btn');
+            const btnText = document.getElementById('btn-text');
+            const errorMsg = document.getElementById('error-msg');
+            const refInput = document.getElementById('ref-input').value.trim();
 
-            // Searching... we use .toString().trim() to be 100% sure
-            const player = players.find(row => 
-                row[2] && row[2].toString().trim() === refInput
-            );
-
-            if (player) {
-                alert("Success! Welcome " + player[0]);
-                localStorage.setItem("isLoggedIn", "true");
-                localStorage.setItem("playerName", player[0]);
-                localStorage.setItem("playerRef", player[2]);
-                localStorage.setItem("playerStatus", player[3]);
-                window.location.href = "dashboard.html";
-            } else {
-                alert("Reference not found in the Google Sheet.");
-                showError("Reference not found. Check your spelling.");
+            if (!refInput) {
+                alert("Please type your Reference ID first.");
+                return;
             }
-        } catch (err) {
-            alert("System Error: " + err.message);
-            console.error(err);
-        }
-    }
 
-    function showError(msg) {
-        const errorMsg = document.getElementById('error-msg');
-        errorMsg.innerText = msg;
-        errorMsg.classList.remove('hidden');
-    }
-</script>
+            // UI Loading State
+            btn.disabled = true;
+            btnText.innerText = "Connecting to Database...";
+            errorMsg.classList.add('hidden');
+
+            // 2. PASTE YOUR NEW GOOGLE SCRIPT URL HERE
+            const SCRIPT_URL = "YOUR_NEW_DEPLOY_URL_HERE";
+
+            try {
+                // Fetching data from Google Sheets
+                const response = await fetch(SCRIPT_URL);
+                
+                if (!response.ok) {
+                    throw new Error("Could not connect to Google Script. Check your URL.");
+                }
+
+                const players = await response.json();
+                console.log("Data received:", players);
+
+                // 3. Search for the player
+                // We check index 2 because Reference is the 3rd column in your sheet
+                const player = players.find(row => 
+                    row[2] && row[2].toString().trim().toLowerCase() === refInput.toLowerCase()
+                );
+
+                if (player) {
+                    // Success: Save details and move to dashboard
+                    localStorage.setItem("isLoggedIn", "true");
+                    localStorage.setItem("playerName", player[0]);
+                    localStorage.setItem("playerRef", player[2]);
+                    localStorage.setItem("playerStatus", player[3] || "Paid");
+
+                    window.location.href = "dashboard.html";
+                } else {
+                    alert("Reference NOT found. Check your Google Sheet to see if the ID matches exactly.");
+                    showError("Reference not found in our records.");
+                }
+
+            } catch (err) {
+                alert("Critical Error: " + err.message);
+                showError("System error. Check console for details.");
+            } finally {
+                btn.disabled = false;
+                btnText.innerText = "Verify & Enter";
+            }
+        }
+
+        function showError(msg) {
+            const errorMsg = document.getElementById('error-msg');
+            errorMsg.innerText = msg;
+            errorMsg.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
