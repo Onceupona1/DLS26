@@ -3,154 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | DLS26 PRO</title>
+    <title>DLS26 PRO | Player Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        if (localStorage.getItem("isLoggedIn") !== "true") {
-            window.location.href = "login.html";
-        }
+        // Redirect if not logged in
+        if (localStorage.getItem("isLoggedIn") !== "true") window.location.href = "login.html";
     </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background: radial-gradient(circle at top right, #0f172a, #020617); }
+        .glass { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .glow-border { position: relative; overflow: hidden; }
+        .glow-border::before {
+            content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: conic-gradient(transparent, #3b82f6, transparent 30%);
+            animation: rotate 4s linear infinite; z-index: -1;
+        }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .status-pill { padding: 2px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; }
+        .skeleton { background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
+        @keyframes loading { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+    </style>
 </head>
-<body class="bg-[#020617] text-slate-300 min-h-screen p-6">
-    <main class="max-w-4xl mx-auto space-y-8">
-        <div class="flex justify-between items-center">
-            <h1 class="text-2xl font-black text-white italic">DLS<span class="text-blue-500">26</span> DASH</h1>
-            <button onclick="localStorage.clear(); location.href='index.html'" 
-                    class="text-xs text-red-500 font-bold hover:text-red-400 transition">
-                LOGOUT
-            </button>
+<body class="text-slate-300 min-h-screen pb-12">
+
+    <nav class="max-w-5xl mx-auto p-6 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-black text-white shadow-lg shadow-blue-500/20">D</div>
+            <h1 class="text-xl font-black text-white tracking-tighter italic uppercase">DLS<span class="text-blue-500">26</span> PRO</h1>
         </div>
+        <button onclick="localStorage.clear(); location.href='index.html'" class="group flex items-center gap-2 text-[10px] font-bold tracking-widest text-slate-500 hover:text-red-400 transition">
+            LOGOUT <span class="group-hover:translate-x-1 transition-transform">→</span>
+        </button>
+    </nav>
 
-        <div class="bg-blue-600/10 p-6 rounded-3xl border border-blue-500/20">
-            <p class="text-xs uppercase font-bold text-blue-400">Welcome back</p>
-            <p id="p-name" class="text-2xl font-black text-white">Loading...</p>
-        </div>
-
-        <section id="fixtures" class="space-y-3">
-            <h2 class="font-bold text-white text-lg">Your Upcoming Fixtures</h2>
-            <div id="fix-list" class="grid gap-3 text-sm"></div>
-        </section>
-
-        <section class="bg-slate-900/50 p-6 rounded-3xl border border-slate-800">
-            <h2 class="font-bold text-white mb-4 text-lg">Last 5 Games</h2>
-            <div id="last-games" class="space-y-3"></div>
-        </section>
-
-        <section class="bg-slate-900/50 p-6 rounded-3xl border border-slate-800">
-            <h2 class="font-bold text-white mb-4 text-lg">League Standings</h2>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm">
-                    <thead>
-                        <tr class="text-xs text-slate-500 uppercase tracking-wider border-b border-slate-700">
-                            <th class="py-3 px-2">Pos</th>
-                            <th class="py-3">Player</th>
-                            <th class="py-3 text-right">PTS</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-body"></tbody>
-                </table>
+    <main class="max-w-4xl mx-auto px-6 space-y-8">
+        
+        <div class="glow-border p-[1px] rounded-[2.5rem]">
+            <div class="bg-[#020617] p-8 rounded-[2.5rem] flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <p class="text-[10px] uppercase font-black tracking-[0.2em] text-blue-500 mb-2">Authenticated Player</p>
+                    <h2 id="p-name" class="text-4xl font-black text-white italic tracking-tight">--</h2>
+                </div>
+                <div class="flex gap-4">
+                    <div class="text-center bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
+                        <p class="text-[9px] text-slate-500 uppercase font-bold">Current Rank</p>
+                        <p id="my-rank" class="text-2xl font-black text-white">#--</p>
+                    </div>
+                </div>
             </div>
-        </section>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <div class="lg:col-span-2 space-y-8">
+                
+                <section>
+                    <div class="flex justify-between items-end mb-4 px-2">
+                        <h3 class="text-xs uppercase font-black tracking-widest text-white">Next Matches</h3>
+                        <span class="text-[10px] text-slate-500">Auto-refresh active</span>
+                    </div>
+                    <div id="fix-list" class="space-y-3">
+                        <div class="skeleton h-20 rounded-3xl w-full"></div>
+                    </div>
+                </section>
+
+                <section class="glass p-6 rounded-[2rem]">
+                    <h3 class="text-xs uppercase font-black tracking-widest text-white mb-6">Recent Form (Last 5)</h3>
+                    <div id="last-games" class="space-y-4">
+                        <div class="skeleton h-12 rounded-2xl w-full"></div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="space-y-8">
+                <section class="glass p-6 rounded-[2rem]">
+                    <h3 class="text-xs uppercase font-black tracking-widest text-white mb-6">Top Standings</h3>
+                    <div class="overflow-hidden">
+                        <table class="w-full text-sm">
+                            <tbody id="table-body">
+                                <tr><td><div class="skeleton h-8 w-full rounded-xl mb-2"></div></td></tr>
+                                <tr><td><div class="skeleton h-8 w-full rounded-xl mb-2"></div></td></tr>
+                                <tr><td><div class="skeleton h-8 w-full rounded-xl"></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <a href="index.html" class="block text-center mt-6 text-[10px] font-bold text-blue-500 uppercase tracking-widest hover:text-blue-400">View Full Table</a>
+                </section>
+
+                <button onclick="window.open('https://forms.gle/YOUR_FORM_LINK', '_blank')" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-5 rounded-[2rem] shadow-xl shadow-blue-500/20 transition-all active:scale-95 text-xs uppercase tracking-widest">
+                    Submit Score
+                </button>
+            </div>
+        </div>
     </main>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHtvLu74wApqPjqoNAp13cCTaFIhmnM5wzvOiwL0-Fwq3Jxm18xa5mWrLLeDJDFujF/exec"; // ← confirm this is your current deployed URL
-
-        const playerName = localStorage.getItem('playerName') || "Player";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHtvLu74wApqPjqoNAp13cCTaFIhmnM5wzvOiwL0-Fwq3Jxm18xa5mWrLLeDJDFujF/exec";
+        const playerName = localStorage.getItem('playerName') || "Elite Player";
         document.getElementById('p-name').innerText = playerName;
 
         async function loadData() {
-            const fixList = document.getElementById('fix-list');
-            const lastGames = document.getElementById('last-games');
-            const tableBody = document.getElementById('table-body');
-
-            // Loading states
-            fixList.innerHTML = '<div class="text-center py-8 text-slate-500 italic">Loading your fixtures...</div>';
-            lastGames.innerHTML = '<div class="text-center py-8 text-slate-500 italic">Loading recent games...</div>';
-            tableBody.innerHTML = '<tr><td colspan="3" class="py-10 text-center text-slate-500 italic">Loading standings...</td></tr>';
-
             try {
-                const res = await fetch(SCRIPT_URL + '?t=' + Date.now(), { cache: 'no-store' });
-                if (!res.ok) throw new Error('Network response was not ok');
-
+                const res = await fetch(`${SCRIPT_URL}?t=${Date.now()}`);
                 const json = await res.json();
 
-                // 1. Your Fixtures (filter where you are home or away)
-                const fixtures = json.fixtures || [];
-                const myFixtures = fixtures.filter(f => 
+                // 1. RENDER FIXTURES
+                const myFixtures = (json.fixtures || []).filter(f => 
                     String(f[1]).trim() === playerName || String(f[2]).trim() === playerName
                 );
-
-                fixList.innerHTML = myFixtures.length === 0
-                    ? '<div class="text-center py-8 text-slate-500 italic">No upcoming fixtures for you yet.</div>'
+                
+                document.getElementById('fix-list').innerHTML = myFixtures.length === 0 
+                    ? `<div class="bg-white/5 p-8 rounded-3xl text-center text-slate-500 text-xs italic">No matches scheduled. Check back later.</div>`
                     : myFixtures.map(f => `
-                        <div class="bg-white/5 p-4 rounded-xl flex justify-between items-center hover:bg-white/10 transition">
-                            <div class="font-medium">
-                                ${f[1]} <span class="text-slate-600 mx-2 font-bold">VS</span> ${f[2]}
+                        <div class="glass p-5 rounded-3xl flex justify-between items-center group hover:border-blue-500/50 transition-all">
+                            <div class="flex items-center gap-4">
+                                <div class="text-sm font-bold text-white">
+                                    ${f[1]} <span class="text-slate-600 px-2 font-black italic text-[10px]">VS</span> ${f[2]}
+                                </div>
                             </div>
-                            <div class="text-blue-400 text-xs uppercase font-bold">${f[3] || 'Date TBD'}</div>
+                            <div class="text-right">
+                                <div class="status-pill bg-blue-500/10 text-blue-400">${f[3] || 'Upcoming'}</div>
+                            </div>
                         </div>
                     `).join('');
 
-                // 2. Last 5 Games (from recentResults – approved only)
-                const results = json.recentResults || [];
-                const myResults = results.filter(r => 
+                // 2. RENDER RECENT GAMES
+                const myResults = (json.recentResults || []).filter(r => 
                     String(r[1]).trim() === playerName || String(r[2]).trim() === playerName
-                ).slice(0, 5); // newest first, limit 5
+                ).slice(0, 5);
 
-                lastGames.innerHTML = myResults.length === 0
-                    ? '<div class="text-center py-8 text-slate-500 italic">No games played yet.</div>'
+                document.getElementById('last-games').innerHTML = myResults.length === 0
+                    ? `<div class="text-slate-600 text-xs italic">Waiting for your first match...</div>`
                     : myResults.map(r => {
                         const isHome = String(r[1]).trim() === playerName;
                         const myScore = isHome ? r[3] : r[4];
                         const oppScore = isHome ? r[4] : r[3];
                         const opponent = isHome ? r[2] : r[1];
-                        let resultClass = '';
-                        let resultText = '';
-                        if (myScore > oppScore) { resultText = 'W'; resultClass = 'text-green-400'; }
-                        else if (myScore === oppScore) { resultText = 'D'; resultClass = 'text-yellow-400'; }
-                        else { resultText = 'L'; resultClass = 'text-red-400'; }
-
-                        const date = new Date(r[0]).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+                        let resultChar = myScore > oppScore ? 'W' : (myScore === oppScore ? 'D' : 'L');
+                        let color = resultChar === 'W' ? 'text-green-400' : (resultChar === 'D' ? 'text-yellow-400' : 'text-red-400');
 
                         return `
-                            <div class="bg-white/5 p-4 rounded-xl flex justify-between items-center">
-                                <div>
-                                    <span class="font-medium">${opponent}</span>
-                                    <span class="mx-2 text-slate-500">•</span>
-                                    <span class="${resultClass} font-bold">${resultText}</span>
+                            <div class="flex justify-between items-center border-b border-white/5 pb-4 last:border-0 last:pb-0">
+                                <div class="flex items-center gap-3">
+                                    <span class="${color} font-black text-sm">${resultChar}</span>
+                                    <span class="text-sm font-bold text-slate-300">${opponent}</span>
                                 </div>
                                 <div class="text-right">
-                                    <div class="font-mono">${myScore} - ${oppScore}</div>
-                                    <div class="text-xs text-slate-500">${date}</div>
+                                    <div class="text-sm font-black text-white font-mono">${myScore} - ${oppScore}</div>
+                                    <div class="text-[9px] text-slate-600 uppercase font-bold">${new Date(r[0]).toLocaleDateString()}</div>
                                 </div>
                             </div>
                         `;
                     }).join('');
 
-                // 3. League Standings (mini)
+                // 3. RENDER STANDINGS
                 const standings = json.standings || [];
-                tableBody.innerHTML = standings.length === 0
-                    ? '<tr><td colspan="3" class="py-10 text-center text-slate-500">No players registered yet.</td></tr>'
-                    : standings.map((p, i) => `
-                        <tr class="border-t border-white/5 ${p[0] === playerName ? 'bg-blue-600/20 font-semibold text-white' : ''}">
-                            <td class="py-3 px-2">${i + 1}</td>
-                            <td class="py-3">${p[0] || 'Unknown'}</td>
-                            <td class="py-3 text-right text-blue-400 font-bold">${p[9] || 0} PTS</td>
+                document.getElementById('table-body').innerHTML = standings.slice(0, 10).map((p, i) => {
+                    const isMe = p[0] === playerName;
+                    if(isMe) document.getElementById('my-rank').innerText = `#${i+1}`;
+                    return `
+                        <tr class="${isMe ? 'bg-blue-600/10' : ''} transition-colors">
+                            <td class="py-3 pr-4 text-[10px] font-mono text-slate-500">0${i+1}</td>
+                            <td class="py-3 text-xs font-bold ${isMe ? 'text-white' : 'text-slate-400'}">${p[0]}</td>
+                            <td class="py-3 text-right text-xs font-black text-blue-500">${p[9]}</td>
                         </tr>
-                    `).join('');
+                    `;
+                }).join('');
 
             } catch (err) {
-                console.error("Dashboard error:", err);
-                fixList.innerHTML = '<div class="text-center py-8 text-red-400">Failed to load fixtures.</div>';
-                lastGames.innerHTML = '<div class="text-center py-8 text-red-400">Failed to load recent games.</div>';
-                tableBody.innerHTML = '<tr><td colspan="3" class="py-10 text-center text-red-400">Failed to load standings.</td></tr>';
+                console.error("Critical Sync Error:", err);
             }
         }
 
-        // Initial load + auto-refresh
         loadData();
-        setInterval(loadData, 90000); // every 1.5 min
+        setInterval(loadData, 60000); // Auto-refresh every minute
     </script>
 </body>
 </html>
