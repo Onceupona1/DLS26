@@ -1,38 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Dashboard | DLS Elite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        // Security check: If not logged in, kick them back to login page
+        // Security: If not logged in, kick back to login
         if (localStorage.getItem("isLoggedIn") !== "true") {
             window.location.href = "login.html";
         }
     </script>
-    <meta charset="UTF-8">
-    <title>Player Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-900 text-white p-6">
-    <div class="max-w-4xl mx-auto">
-        <h1 class="text-3xl font-bold mb-2 text-green-400">Welcome, Champ!</h1>
-        <p class="text-slate-400 mb-8">Your private tournament area.</p>
+<body class="bg-[#0b1120] text-slate-200 min-h-screen p-6">
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-slate-800 p-6 rounded-lg border border-slate-700">
-                <h2 class="font-bold text-xl mb-4">Your Next Match</h2>
-                <div class="flex justify-between items-center text-lg">
-                    <span>YOU</span>
-                    <span class="text-green-500 font-bold">VS</span>
-                    <span class="text-slate-500">Waiting for Opponent...</span>
-                </div>
+    <div class="max-w-4xl mx-auto">
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-2xl font-black text-white">DLS<span class="text-blue-500">26</span> DASHBOARD</h1>
+                <p class="text-slate-400 text-sm">Welcome back, <span id="user-name" class="text-blue-400 font-bold">Player</span></p>
+            </div>
+            <button onclick="localStorage.clear(); window.location.href='index.html'" class="text-xs bg-slate-800 px-4 py-2 rounded-lg hover:bg-red-900/30 transition">Logout</button>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div class="bg-slate-900/50 border border-slate-800 p-6 rounded-3xl backdrop-blur-sm">
+                <h3 class="text-slate-500 text-xs font-bold uppercase mb-2">League Status</h3>
+                <p id="user-status" class="text-xl font-bold text-white">Checking...</p>
             </div>
 
-            <div class="bg-slate-800 p-6 rounded-lg border border-orange-500/30">
-                <h2 class="font-bold text-xl mb-4 text-orange-400">Playoff Status</h2>
-                <p class="text-sm text-slate-300">Late entries detected. You may be paired for a playoff match to secure your slot.</p>
+            <div class="bg-slate-900/50 border border-slate-800 p-6 rounded-3xl backdrop-blur-sm">
+                <h3 class="text-slate-500 text-xs font-bold uppercase mb-2">Your Next Match</h3>
+                <p class="text-xl font-bold text-slate-600">Pending Draw</p>
+            </div>
+
+            <div class="bg-slate-900/50 border border-slate-800 p-6 rounded-3xl backdrop-blur-sm">
+                <h3 class="text-slate-500 text-xs font-bold uppercase mb-2">Ref ID</h3>
+                <p id="user-ref" class="text-sm font-mono text-blue-300">-------</p>
             </div>
         </div>
 
-        <button onclick="localStorage.removeItem('isLoggedIn'); window.location.href='index.html'" class="mt-12 text-slate-500 hover:text-white text-sm">Log Out</button>
+        <section class="bg-blue-600/5 border border-blue-500/20 p-8 rounded-3xl">
+            <h2 class="text-xl font-bold text-white mb-4 text-center">Submit Match Result</h2>
+            <p class="text-slate-400 text-center text-sm mb-6">Played your game? Upload your screenshot and score here for verification.</p>
+            
+            <div class="max-w-md mx-auto space-y-4">
+                <div class="flex gap-4">
+                    <input type="number" placeholder="Your Score" class="w-1/2 bg-slate-950 p-4 rounded-xl border border-slate-800 outline-none focus:border-blue-500">
+                    <input type="number" placeholder="Opponent Score" class="w-1/2 bg-slate-950 p-4 rounded-xl border border-slate-800 outline-none focus:border-blue-500">
+                </div>
+                <button class="w-full bg-blue-600 py-4 rounded-xl font-bold hover:bg-blue-500 transition">Submit Proof</button>
+            </div>
+        </section>
     </div>
+
+    <script>
+        // Fill the dashboard with saved data
+        document.getElementById('user-name').innerText = localStorage.getItem('playerName') || 'Player';
+        document.getElementById('user-ref').innerText = localStorage.getItem('playerRef') || 'N/A';
+        
+        // This is the important part: it shows "Main League" or "Playoff"
+        const status = localStorage.getItem('playerStatus') || 'Paid';
+        const statusEl = document.getElementById('user-status');
+        statusEl.innerText = status;
+        
+        if (status.includes("Main")) {
+            statusEl.classList.add('text-green-400');
+        } else {
+            statusEl.classList.add('text-orange-400');
+        }
+    </script>
 </body>
 </html>
