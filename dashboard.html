@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        // Security check: If not logged in, kick them back to login page
+        if (localStorage.getItem("isLoggedIn") !== "true") {
+            window.location.href = "login.html";
+        }
+    </script>
+    <meta charset="UTF-8">
+    <title>Player Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-white p-6">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-2 text-green-400">Welcome, Champ!</h1>
+        <p class="text-slate-400 mb-8">Your private tournament area.</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-slate-800 p-6 rounded-lg border border-slate-700">
+                <h2 class="font-bold text-xl mb-4">Your Next Match</h2>
+                <div class="flex justify-between items-center text-lg">
+                    <span>YOU</span>
+                    <span class="text-green-500 font-bold">VS</span>
+                    <span class="text-slate-500">Waiting for Opponent...</span>
+                </div>
+            </div>
+
+            <div class="bg-slate-800 p-6 rounded-lg border border-orange-500/30">
+                <h2 class="font-bold text-xl mb-4 text-orange-400">Playoff Status</h2>
+                <p class="text-sm text-slate-300">Late entries detected. You may be paired for a playoff match to secure your slot.</p>
+            </div>
+        </div>
+
+        <button onclick="localStorage.removeItem('isLoggedIn'); window.location.href='index.html'" class="mt-12 text-slate-500 hover:text-white text-sm">Log Out</button>
+    </div>
+</body>
+</html>
