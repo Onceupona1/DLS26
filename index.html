@@ -3,115 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DLS 26 PRO | The Ultimate League</title>
+    <title>DLS 26 PRO | Home</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); }
         .hero-gradient { background: radial-gradient(circle at 50% 50%, rgba(37, 99, 235, 0.1) 0%, transparent 50%); }
-        tr { border-bottom: 1px solid rgba(30, 41, 59, 0.5); }
-        tr:last-child { border-bottom: none; }
-        td { padding: 12px 8px; }
     </style>
 </head>
 <body class="bg-[#020617] text-slate-200 min-h-screen">
 
     <nav class="max-w-7xl mx-auto p-6 flex justify-between items-center relative z-10">
         <h1 class="text-2xl font-black tracking-tighter text-white uppercase">DLS<span class="text-blue-500">26</span> PRO</h1>
-        <div class="flex gap-4">
-            <a href="login.html" class="text-xs font-bold hover:text-blue-400 transition">LOGOUT</a>
-        </div>
+        <a href="login.html" class="bg-blue-600 text-white px-6 py-2 rounded-full font-bold text-sm hover:bg-blue-500 transition">PLAYER LOGIN</a>
     </nav>
 
-    <main class="relative pt-10 pb-32 px-6 overflow-hidden">
+    <main class="relative pt-10 pb-32 px-6">
         <div class="hero-gradient absolute inset-0 -z-10"></div>
         
-        <div class="max-w-5xl mx-auto text-center">
-            <div class="inline-flex items-center gap-2 bg-slate-800/50 border border-slate-700/50 px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest text-blue-400 mb-8">
-                <span class="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
-                Season 1 Live Standings
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-5xl md:text-7xl font-black text-white mb-6 tracking-tight">The Ultimate <span class="text-blue-500">DLS League</span></h1>
+            <p class="text-slate-400 mb-10">Professional EPL-style competition. Join the elite.</p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+                <a href="https://paystack.shop/pay/h83gp0tvg6" class="bg-white text-black px-8 py-4 rounded-2xl font-black hover:bg-slate-200 transition">REGISTER NOW</a>
             </div>
 
-            <h1 class="text-4xl md:text-6xl font-black text-white mb-6 tracking-tight">
-                The Official <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">Pro Leaderboard</span>
-            </h1>
-
-            <div class="glass border border-slate-800 p-4 md:p-8 rounded-[2rem] shadow-2xl relative mt-12">
-                <div class="flex justify-between items-center mb-6 px-2">
-                    <h2 class="text-xl font-bold text-white">League Standings</h2>
-                    <span class="bg-blue-600 px-3 py-1 rounded text-[10px] font-black uppercase tracking-tighter">Live</span>
-                </div>
-
+            <div class="glass border border-slate-800 p-6 rounded-[2.5rem] shadow-2xl">
+                <h2 class="text-xl font-bold mb-6 text-left px-2">Live Standings</h2>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
                         <thead>
                             <tr class="text-[10px] text-slate-500 uppercase tracking-widest border-b border-slate-800">
-                                <th class="pb-4">Pos</th>
-                                <th class="pb-4">Player</th>
-                                <th class="pb-4">P</th>
-                                <th class="pb-4">W</th>
-                                <th class="pb-4">D</th>
-                                <th class="pb-4">L</th>
-                                <th class="pb-4">GD</th>
-                                <th class="pb-4 text-blue-400">Pts</th>
+                                <th class="pb-4">Pos</th><th class="pb-4">Player</th><th class="pb-4">P</th><th class="pb-4">W</th><th class="pb-4">D</th><th class="pb-4">L</th><th class="pb-4 text-blue-400">Pts</th>
                             </tr>
                         </thead>
-                        <tbody id="league-table-body" class="text-sm font-medium">
-                            <tr>
-                                <td colspan="8" class="py-20 text-center text-slate-500 animate-pulse">
-                                    Fetching match data from servers...
-                                </td>
-                            </tr>
+                        <tbody id="league-table-body" class="text-sm">
+                            <tr><td colspan="7" class="py-10 text-center animate-pulse">Loading Live Data...</td></tr>
                         </tbody>
                     </table>
                 </div>
-            </div>
-
-            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mt-12">
-                <a href="submit-result.html" class="w-full sm:w-auto bg-blue-600 text-white px-8 py-4 rounded-2xl font-black hover:bg-blue-500 transition shadow-lg shadow-blue-500/20">SUBMIT MATCH RESULT</a>
-                <a href="fixtures.html" class="w-full sm:w-auto glass border border-slate-700 text-white px-8 py-4 rounded-2xl font-bold hover:bg-slate-800 transition">VIEW FIXTURES</a>
             </div>
         </div>
     </main>
 
     <script>
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzHtvLu74wApqPjqoNAp13cCTaFIhmnM5wzvOiwL0-Fwq3Jxm18xa5mWrLLeDJDFujF/exec"; 
-
-        async function loadLeagueTable() {
+        async function loadTable() {
             try {
-                const response = await fetch(WEB_APP_URL);
-                const data = await response.json();
-                
-                const tableBody = document.querySelector("#league-table-body");
-                if (!tableBody || !data.length) {
-                    tableBody.innerHTML = '<tr><td colspan="8" class="text-center py-10">No players registered yet.</td></tr>';
-                    return;
-                }
-
-                // DATA MAPPING (Matches your Spreadsheet Columns A, E, F, G, H, I, J)
-                const rows = data.map((item, index) => {
-                    return `
-                        <tr class="hover:bg-slate-800/30 transition">
-                            <td class="text-slate-500 font-mono">${index + 1}</td>
-                            <td class="text-white font-bold">${item[0] || "Guest"}</td>
-                            <td>${item[4] || 0}</td>
-                            <td>${item[5] || 0}</td>
-                            <td>${item[6] || 0}</td>
-                            <td>${item[7] || 0}</td>
-                            <td class="${(item[8] < 0) ? 'text-red-400' : 'text-slate-400'}">${item[8] || 0}</td>
-                            <td class="text-blue-400 font-black">${item[9] || 0}</td>
-                        </tr>
-                    `;
-                }).join('');
-
-                tableBody.innerHTML = rows;
-            } catch (error) {
-                console.error("Error loading standings:", error);
-                document.querySelector("#league-table-body").innerHTML = '<tr><td colspan="8" class="text-center py-10 text-red-400">Failed to connect to Database.</td></tr>';
-            }
+                const res = await fetch(WEB_APP_URL);
+                const data = await res.json();
+                document.getElementById('league-table-body').innerHTML = data.map((item, i) => `
+                    <tr class="border-b border-slate-800/50">
+                        <td class="py-4 text-slate-500">${i+1}</td>
+                        <td class="py-4 font-bold text-white">${item[0] || "Player"}</td>
+                        <td>${item[4] || 0}</td><td>${item[5] || 0}</td><td>${item[6] || 0}</td><td>${item[7] || 0}</td>
+                        <td class="text-blue-400 font-black">${item[9] || 0}</td>
+                    </tr>
+                `).join('');
+            } catch (e) { console.error(e); }
         }
-
-        // Initialize on Load
-        window.onload = loadLeagueTable;
+        window.onload = loadTable;
     </script>
 </body>
 </html>
