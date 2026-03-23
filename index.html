@@ -3,70 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DLS 26 PRO • Elite Dream League Soccer League</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>The Ultimate DLS League | Professional Portal</title>
     <style>
-        .glass { background: rgba(15,23,42,0.85); backdrop-filter: blur(16px); }
-        .hero { background: linear-gradient(135deg, #1e3a8a, #0f172a); }
+        :root {
+            --bg: #050a18; --card: #111a2e; --accent: #3b82f6; 
+            --text: #ffffff; --dim: #94a3b8; --success: #10b981;
+        }
+        body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 450px; }
+        .card { background: var(--card); border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .hidden { display: none; }
+        
+        /* UI Elements */
+        h1 { font-size: 2rem; text-align: center; }
+        .btn { background: var(--accent); color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; text-decoration: none; display: block; text-align: center; margin-top: 10px; }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #1e293b; background: #0f172a; color: white; box-sizing: border-box; }
+        
+        /* Table Styling */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { text-align: left; color: var(--dim); font-size: 0.8rem; padding-bottom: 10px; }
+        td { padding: 12px 0; border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
+        .pts { color: var(--accent); font-weight: bold; text-align: right; }
+        .status-tag { font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; background: #1e293b; color: var(--dim); }
     </style>
 </head>
-<body class="bg-[#020617] text-slate-200 min-h-screen">
-    <nav class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
-        <h1 class="text-3xl font-black tracking-tighter">DLS<span class="text-blue-500">26</span><span class="text-xs align-super ml-1 text-green-400">PRO</span></h1>
-        <a href="login.html" class="bg-blue-600 hover:bg-blue-500 px-7 py-3 rounded-full font-bold shadow-lg shadow-blue-600/30 transition">PLAYER LOGIN</a>
-    </nav>
+<body>
 
-    <main class="hero pt-16 pb-20 text-center">
-        <h1 class="text-6xl md:text-7xl font-black leading-none mb-4">THE ULTIMATE<br>DLS 26 PRO LEAGUE</h1>
-        <p class="text-xl text-slate-400 mb-8">EPL-style competition • Auto fixtures • Real results • Admin verified</p>
-        
-        <a href="https://paystack.shop/pay/h83gp0tvg6" 
-           onclick="localStorage.setItem('justPaid', 'true');"
-           class="inline-block bg-white text-black font-black text-xl px-10 py-5 rounded-3xl hover:scale-105 transition shadow-2xl">
-            REGISTER NOW • ₵ Payment Secured
-        </a>
-        
-        <p class="text-xs text-slate-500 mt-6">After payment you will be redirected back here → then login with your reference</p>
-    </main>
-
-    <!-- Live Standings -->
-    <div class="max-w-5xl mx-auto px-6 pb-20">
-        <div class="glass border border-slate-700 rounded-3xl p-6 shadow-2xl">
-            <h2 class="text-2xl font-bold flex justify-between">🌍 LIVE STANDINGS <span class="text-green-400 text-sm animate-pulse">● AUTO UPDATES</span></h2>
-            <table class="w-full mt-4 text-sm">
-                <thead class="text-xs text-slate-400 border-b border-slate-700">
-                    <tr><th class="py-3">POS</th><th>PLAYER</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th class="text-blue-400">PTS</th></tr>
-                </thead>
-                <tbody id="standings-body" class="divide-y divide-slate-700"></tbody>
-            </table>
-        </div>
+<div class="container">
+    <div id="view-landing" class="card">
+        <h1>The Ultimate <span style="color:var(--accent)">DLS League</span></h1>
+        <p style="color:var(--dim); text-align:center;">Professional competition starts here.</p>
+        <a href="https://paystack.shop/pay/h83gp0tvg6" class="btn">Register & Pay via Paystack</a>
+        <button class="btn" style="background:transparent; border: 1px solid var(--accent);" onclick="showView('view-login')">Already Registered? Login</button>
     </div>
 
-    <script>
-        const URL = "https://script.google.com/macros/s/AKfycbzHtvLu74wApqPjqoNAp13cCTaFIhmnM5wzvOiwL0-Fwq3Jxm18xa5mWrLLeDJDFujF/exec";
-        async function load() {
-            const res = await fetch(URL + '?t=' + Date.now());
-            const j = await res.json();
-            document.getElementById('standings-body').innerHTML = j.standings.map((r,i) => `
-                <tr class="hover:bg-slate-800/50">
-                    <td class="py-4">${i+1}</td>
-                    <td class="font-bold">${r[0]}</td>
-                    <td>${r[4]}</td><td>${r[5]}</td><td>${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td>
-                    <td class="font-black text-blue-400">${r[9]}</td>
-                </tr>
-            `).join('');
-            
-            // Success banner from Paystack redirect
-            if (location.search.includes('success') || localStorage.getItem('justPaid')) {
-                document.body.insertAdjacentHTML('afterbegin', 
-                    `<div class="fixed top-4 left-1/2 -translate-x-1/2 bg-green-600 text-white px-8 py-3 rounded-2xl shadow-xl flex items-center gap-3 z-50">
-                        ✅ Payment Received! Use your Paystack Reference to login below ↓
-                        <button onclick="this.parentElement.remove()" class="underline">Close</button>
-                    </div>`);
-                localStorage.removeItem('justPaid');
-            }
+    <div id="view-login" class="card hidden">
+        <h3>Login to Dashboard</h3>
+        <p style="color:var(--dim); font-size:0.8rem;">Enter the Paystack Reference ID from your receipt.</p>
+        <input type="text" id="loginRef" placeholder="Reference ID (e.g. T738...)">
+        <button class="btn" onclick="handleLogin()">Access Dashboard</button>
+        <p onclick="showView('view-landing')" style="text-align:center; font-size:0.8rem; cursor:pointer; color:var(--dim);">← Back</p>
+    </div>
+
+    <div id="view-dashboard" class="hidden">
+        <div class="card">
+            <h3>Live Standings <span class="status-tag">● AUTO-SORTED</span></h3>
+            <table>
+                <thead><tr><th>POS</th><th>PLAYER</th><th>P</th><th style="text-align:right">PTS</th></tr></thead>
+                <tbody id="standings-table"></tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Next Fixture</h3>
+            <div id="next-fixture-box" style="text-align:center; font-weight:bold; color:var(--accent); padding:10px;">Calculating...</div>
+        </div>
+
+        <button class="btn" onclick="showView('view-submit')">Enter Match Result</button>
+    </div>
+
+    <div id="view-submit" class="card hidden">
+        <h3>Submit Match Proof</h3>
+        <select id="homeSelect"></select>
+        <div style="display:flex; gap:10px;">
+            <input type="number" id="hScore" placeholder="Your Score">
+            <input type="number" id="aScore" placeholder="Opponent Score">
+        </div>
+        <select id="awaySelect"></select>
+        
+        <label style="font-size:0.8rem; color:var(--dim);">Upload Match Screenshot:</label>
+        <input type="file" id="screenshot" accept="image/*">
+        
+        <button class="btn" id="submitBtn" onclick="submitScore()">Submit for Admin Review</button>
+        <p onclick="showView('view-dashboard')" style="text-align:center; font-size:0.8rem; cursor:pointer; color:var(--dim);">Cancel</p>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHtvLu74wApqPjqoNAp13cCTaFIhmnM5wzvOiwL0-Fwq3Jxm18xa5mWrLLeDJDFujF/exec";
+    let currentUser = null;
+
+    function showView(viewId) {
+        document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
+        document.getElementById(viewId).classList.remove('hidden');
+    }
+
+    async function handleLogin() {
+        const ref = document.getElementById('loginRef').value;
+        if(!ref) return alert("Enter Reference ID");
+        
+        // Fetch users from your Sheet to verify
+        const response = await fetch(`${SCRIPT_URL}?action=getUsers`);
+        const data = await response.json();
+        
+        const user = data.find(u => u.refId === ref);
+        if(user) {
+            currentUser = user;
+            loadDashboard();
+            showView('view-dashboard');
+        } else {
+            alert("Invalid Reference ID. Please ensure admin has confirmed your payment.");
         }
-        window.onload = load;
-    </script>
+    }
+
+    async function loadDashboard() {
+        const response = await fetch(`${SCRIPT_URL}?action=getLeagueData`);
+        const data = await response.json();
+        
+        // 1. Fixed Position Standings Logic
+        const sorted = data.standings.sort((a,b) => b.pts - a.pts || (b.gd - a.gd));
+        document.getElementById('standings-table').innerHTML = sorted.map((p, i) => `
+            <tr><td>${i+1}</td><td>${p.name}</td><td>${p.played}</td><td class="pts">${p.pts}</td></tr>
+        `).join('');
+
+        // 2. Load Players into Select dropdowns
+        const playersHtml = data.players.map(p => `<option value="${p}">${p}</option>`).join('');
+        document.getElementById('homeSelect').innerHTML = playersHtml;
+        document.getElementById('awaySelect').innerHTML = playersHtml;
+        
+        document.getElementById('next-fixture-box').innerText = data.nextMatch || "No pending fixtures";
+    }
+
+    async function submitScore() {
+        const fileInput = document.getElementById('screenshot');
+        if(!fileInput.files[0]) return alert("Please upload a screenshot");
+
+        const btn = document.getElementById('submitBtn');
+        btn.innerText = "Uploading...";
+        btn.disabled = true;
+
+        const reader = new FileReader();
+        reader.readAsDataURL(fileInput.files[0]);
+        reader.onload = async () => {
+            const payload = {
+                action: "submitScore",
+                home: document.getElementById('homeSelect').value,
+                away: document.getElementById('awaySelect').value,
+                hScore: document.getElementById('hScore').value,
+                aScore: document.getElementById('aScore').value,
+                image: reader.result,
+                submittedBy: currentUser.name
+            };
+
+            await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+            alert("Submitted! Waiting for Admin confirmation.");
+            showView('view-dashboard');
+            btn.innerText = "Submit for Admin Review";
+            btn.disabled = false;
+        };
+    }
+</script>
 </body>
 </html>
