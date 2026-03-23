@@ -27,7 +27,7 @@
         <div class="space-y-5">
             <div>
                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1 mb-2">Transaction Reference</label>
-                <input type="text" id="ref-input" placeholder="T438003..." 
+                <input type="text" id="ref-input" placeholder="T513408..." 
                     class="w-full bg-slate-900/50 border border-slate-800 p-4 rounded-2xl outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-white font-mono placeholder:text-slate-700">
             </div>
 
@@ -36,7 +36,7 @@
                 <span id="btn-text">Verify & Enter</span>
             </button>
 
-            <p id="error-msg" class="text-red-400 text-xs text-center font-medium hidden bg-red-400/10 py-2 rounded-lg"></p>
+            <p id="error-msg" class="text-red-400 text-xs text-center font-medium hidden bg-red-400/10 py-2 rounded-lg mt-4"></p>
         </div>
 
         <div class="mt-8 pt-6 border-t border-slate-800/50 text-center">
@@ -46,13 +46,10 @@
 
     <script>
         async function checkLogin() {
-            // 1. Alert to confirm button works
-            console.log("Login sequence started...");
-            
             const btn = document.getElementById('login-btn');
             const btnText = document.getElementById('btn-text');
             const errorMsg = document.getElementById('error-msg');
-            const refInput = document.getElementById('ref-input').value.trim();
+            const refInput = document.getElementById('ref-input').value.trim().toLowerCase();
 
             if (!refInput) {
                 alert("Please type your Reference ID first.");
@@ -64,45 +61,41 @@
             btnText.innerText = "Connecting to Database...";
             errorMsg.classList.add('hidden');
 
-            // 2. PASTE YOUR NEW GOOGLE SCRIPT URL HERE
             const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHtvLu74wApqPjqoNAp13cCTaFIhmnM5wzvOiwL0-Fwq3Jxm18xa5mWrLLeDJDFujF/exec";
 
             try {
-                // Fetching data from Google Sheets
                 const response = await fetch(SCRIPT_URL);
+                const result = await response.json();
                 
-                if (!response.ok) {
-                    throw new Error("Could not connect to Google Script. Check your URL.");
-                }
+                // PATCH: Access result.standings specifically to avoid the .find error
+                const players = result.standings;
 
-                const players = await response.json();
-                console.log("Data received:", players);
-
-                // 3. Search for the player
-                // We check index 2 because Reference is the 3rd column in your sheet
+                // Search for the player using Column C (Index 2)
                 const player = players.find(row => 
-                    row[2] && row[2].toString().trim().toLowerCase() === refInput.toLowerCase()
+                    row[2] && row[2].toString().trim().toLowerCase() === refInput
                 );
 
                 if (player) {
-                    // Success: Save details and move to dashboard
+                    // Success: Save details to local storage
                     localStorage.setItem("isLoggedIn", "true");
-                    localStorage.setItem("playerName", player[0]);
-                    localStorage.setItem("playerRef", player[2]);
-                    localStorage.setItem("playerStatus", player[3] || "Paid");
+                    localStorage.setItem("playerName", player[0]); // Col A
+                    localStorage.setItem("playerRef", player[2]);  // Col C
+                    localStorage.setItem("playerStatus", player[3] || "Verified Player"); // Col D
 
+                    btnText.innerText = "Access Granted!";
                     window.location.href = "dashboard.html";
                 } else {
-                    alert("Reference NOT found. Check your Transaction reference.");
-                    showError("Reference not found in our records.");
+                    showError("Reference not found. Please check and try again.");
                 }
 
             } catch (err) {
-                alert("Critical Error: " + err.message);
-                showError("System error. Check console for details.");
+                console.error(err);
+                showError("Database connection failed. Please try again later.");
             } finally {
                 btn.disabled = false;
-                btnText.innerText = "Verify & Enter";
+                if(btnText.innerText !== "Access Granted!") {
+                    btnText.innerText = "Verify & Enter";
+                }
             }
         }
 
