@@ -1,78 +1,129 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DLS League Portal</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #050a18;
-      color: white;
-    }
-    header {
-      padding: 15px 30px;
-      background: #0a122a;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .logo {
-      font-size: 20px;
-      font-weight: bold;
-      color: #3b82f6;
-    }
-    .container {
-      max-width: 1000px;
-      margin: auto;
-      padding: 20px;
-    }
-    .card {
-      background: #0a122a;
-      padding: 20px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
-    }
-    input, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 5px;
-      border: none;
-    }
-    input {
-      background: #111827;
-      color: white;
-    }
-    button {
-      background: #3b82f6;
-      color: white;
-      cursor: pointer;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-    th, td {
-      padding: 10px;
-      text-align: left;
-      border-bottom: 1px solid #1f2937;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DLS League Portal</title>
+
+<style>
+:root {
+  --bg: #050a18;
+  --card: #0a122a;
+  --accent: #3b82f6;
+  --text: #ffffff;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+header {
+  background: #0a122a;
+  padding: 15px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  color: var(--accent);
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.container {
+  max-width: 1000px;
+  margin: auto;
+  padding: 20px;
+}
+
+.card {
+  background: var(--card);
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+h2 {
+  margin-top: 0;
+}
+
+input, button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: none;
+}
+
+input {
+  background: #111827;
+  color: white;
+}
+
+button {
+  background: var(--accent);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid #1f2937;
+}
+
+th {
+  color: #9ca3af;
+  text-align: left;
+}
+
+tr:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+.badge {
+  background: var(--accent);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.top {
+  color: #22c55e;
+  font-weight: bold;
+}
+
+</style>
 </head>
+
 <body>
 
 <header>
-  <div class="logo">DLS League</div>
+  <div class="logo">DLS League Portal</div>
 </header>
 
+<!-- AUTH -->
 <div class="container" id="auth">
+
   <div class="card">
-    <h2>Register</h2>
-    <p>Click below to pay and join the league</p>
+    <h2>Join League</h2>
+    <p>Register and pay to join the competition</p>
     <a href="https://paystack.shop/pay/h83gp0tvg6" target="_blank">
       <button>Register & Pay</button>
     </a>
@@ -80,31 +131,38 @@
 
   <div class="card">
     <h2>Login</h2>
-    <input type="text" id="ref" placeholder="Enter Reference ID">
+    <input id="ref" placeholder="Enter Paystack Reference ID">
     <button onclick="login()">Login</button>
   </div>
+
 </div>
 
+<!-- DASHBOARD -->
 <div class="container" id="dashboard" style="display:none;">
+
   <div class="card">
-    <h2>Standings</h2>
+    <h2>League Standings</h2>
     <table id="table"></table>
   </div>
 
   <div class="card">
-    <h2>Submit Score</h2>
-    <input type="text" id="home" placeholder="Home Player">
-    <input type="text" id="away" placeholder="Away Player">
-    <input type="number" id="hs" placeholder="Home Score">
-    <input type="number" id="as" placeholder="Away Score">
-    <input type="file" id="img">
-    <button onclick="submitScore()">Submit</button>
+    <h2>Submit Match Result</h2>
+
+    <input id="home" placeholder="Home Player">
+    <input id="away" placeholder="Away Player">
+    <input id="hs" type="number" placeholder="Home Score">
+    <input id="as" type="number" placeholder="Away Score">
+    <input id="img" type="file">
+
+    <button onclick="submitScore()">Submit Result</button>
   </div>
+
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHtvLu74wApqPjqoNAp13cCTaFIhmnM5wzvOiwL0-Fwq3Jxm18xa5mWrLLeDJDFujF/exec";
+const SCRIPT_URL = "PASTE_YOUR_SCRIPT_URL_HERE";
 
+/* LOGIN */
 async function login() {
   const ref = document.getElementById("ref").value;
 
@@ -113,20 +171,23 @@ async function login() {
 
   const user = users.find(u => u.Reference_ID == ref);
 
-  if (user) {
-    localStorage.setItem("user", JSON.stringify(user));
-    showDashboard();
-  } else {
+  if (!user) {
     alert("Invalid Reference ID");
+    return;
   }
+
+  localStorage.setItem("user", JSON.stringify(user));
+  loadDashboard();
 }
 
-function showDashboard() {
+/* LOAD DASHBOARD */
+function loadDashboard() {
   document.getElementById("auth").style.display = "none";
   document.getElementById("dashboard").style.display = "block";
   loadStandings();
 }
 
+/* STANDINGS */
 async function loadStandings() {
   const res = await fetch(`${SCRIPT_URL}?action=getStandings`);
   const data = await res.json();
@@ -135,20 +196,37 @@ async function loadStandings() {
     .map(([name, stats]) => ({ name, ...stats }))
     .sort((a, b) => b.pts - a.pts || b.gd - a.gd);
 
-  let html = `<tr><th>#</th><th>Player</th><th>PTS</th><th>GD</th></tr>`;
+  let html = `
+    <tr>
+      <th>#</th>
+      <th>Player</th>
+      <th>PTS</th>
+      <th>GD</th>
+    </tr>
+  `;
 
   sorted.forEach((p, i) => {
-    html += `<tr><td>${i+1}</td><td>${p.name}</td><td>${p.pts}</td><td>${p.gd}</td></tr>`;
+    html += `
+      <tr>
+        <td>${i + 1}</td>
+        <td class="${i === 0 ? 'top' : ''}">${p.name}</td>
+        <td>${p.pts}</td>
+        <td>${p.gd}</td>
+      </tr>
+    `;
   });
 
   document.getElementById("table").innerHTML = html;
 }
 
+/* SUBMIT SCORE */
 async function submitScore() {
   const file = document.getElementById("img").files[0];
+  if (!file) return alert("Upload screenshot");
+
   const base64 = await toBase64(file);
 
-  const data = {
+  const payload = {
     action: "submitScore",
     home: document.getElementById("home").value,
     away: document.getElementById("away").value,
@@ -159,27 +237,29 @@ async function submitScore() {
 
   await fetch(SCRIPT_URL, {
     method: "POST",
-    body: JSON.stringify(data)
+    body: JSON.stringify(payload)
   });
 
-  alert("Submitted for review");
+  alert("Submitted for approval");
 }
 
+/* IMAGE TO BASE64 */
 function toBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = () => resolve(reader.result);
-    reader.onerror = error => reject(error);
+    reader.onerror = reject;
   });
 }
 
-// Auto login
+/* AUTO LOGIN */
 if (localStorage.getItem("user")) {
-  showDashboard();
+  loadDashboard();
 }
 </script>
 
 </body>
 </html>
+```
 
