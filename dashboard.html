@@ -11,7 +11,7 @@
     </script>
     <style>
         .glass-card { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
-        .tab-active { border-bottom: 2px solid #3b82f6; color: white; }
+        .player-row-highlight { background: rgba(59, 130, 246, 0.15); border-left: 4px solid #3b82f6; }
     </style>
 </head>
 <body class="bg-[#020617] text-slate-200 min-h-screen pb-20">
@@ -27,15 +27,15 @@
     <main class="max-w-5xl mx-auto px-6 space-y-10">
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="glass-card p-6 rounded-3xl">
+            <div class="glass-card p-6 rounded-3xl text-center md:text-left">
                 <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-1">Your Status</p>
                 <p id="dash-status" class="text-xl font-bold text-white">Loading...</p>
             </div>
-            <div class="glass-card p-6 rounded-3xl">
+            <div class="glass-card p-6 rounded-3xl text-center md:text-left">
                 <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-1">Current Matchday</p>
                 <p class="text-xl font-bold text-blue-400">Gameweek 1</p>
             </div>
-            <div class="glass-card p-6 rounded-3xl">
+            <div class="glass-card p-6 rounded-3xl text-center md:text-left">
                 <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-1">Tournament Type</p>
                 <p class="text-xl font-bold text-white">EPL Style League</p>
             </div>
@@ -47,9 +47,9 @@
                 <span class="text-[10px] bg-blue-600 px-2 py-1 rounded text-white font-bold uppercase">Live</span>
             </div>
             <div class="overflow-x-auto p-4">
-                <table class="w-full text-sm text-left">
+                <table class="w-full text-sm text-left border-collapse">
                     <thead>
-                        <tr class="text-slate-500 font-bold">
+                        <tr class="text-slate-500 font-bold border-b border-white/5">
                             <th class="p-3">Pos</th>
                             <th class="p-3">Player</th>
                             <th class="p-3">P</th>
@@ -61,7 +61,7 @@
                         </tr>
                     </thead>
                     <tbody id="league-table-body">
-                        <tr><td colspan="8" class="text-center py-10 text-slate-600 italic">Connecting to League Database...</td></tr>
+                        <tr><td colspan="8" class="text-center py-10 text-slate-600 italic animate-pulse">Connecting to League Database...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -70,60 +70,72 @@
         <section class="bg-blue-600/10 border border-blue-500/20 rounded-[2rem] p-8">
             <div class="max-w-xl mx-auto text-center mb-8">
                 <h2 class="text-2xl font-bold text-white">Submit Match Result</h2>
-                <p class="text-slate-400 text-sm">Submit your scores and screenshot for admin verification.</p>
+                <p class="text-slate-400 text-sm">Results will appear in standings once verified by Admin.</p>
             </div>
 
             <form id="result-form" class="max-w-2xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
                 <input type="text" id="opp-name" placeholder="Opponent Name" required class="w-full bg-slate-950 p-4 rounded-2xl border border-slate-800 outline-none focus:border-blue-500 text-white">
-                <input type="text" id="ss-link" placeholder="Screenshot Link (e.g. Imgur)" required class="w-full bg-slate-950 p-4 rounded-2xl border border-slate-800 outline-none focus:border-blue-500 text-white">
+                <input type="text" id="ss-link" placeholder="Screenshot Link (Imgur/Drive)" required class="w-full bg-slate-950 p-4 rounded-2xl border border-slate-800 outline-none focus:border-blue-500 text-white">
                 <div class="flex gap-2">
                     <input type="number" id="my-score" placeholder="Your Score" required class="w-1/2 bg-slate-950 p-4 rounded-2xl border border-slate-800 outline-none focus:border-blue-500 text-white text-center">
-                    <input type="number" id="opp-score" placeholder="Opponent Score" required class="w-1/2 bg-slate-950 p-4 rounded-2xl border border-slate-800 outline-none focus:border-blue-500 text-white text-center">
+                    <input type="number" id="opp-score" placeholder="Opp Score" required class="w-1/2 bg-slate-950 p-4 rounded-2xl border border-slate-800 outline-none focus:border-blue-500 text-white text-center">
                 </div>
-                <button type="submit" id="submit-btn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl transition-all shadow-lg shadow-blue-900/30">Submit Result</button>
+                <button type="submit" id="submit-btn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black rounded-2xl transition-all shadow-lg shadow-blue-900/30 py-4 uppercase">Submit Result</button>
             </form>
         </section>
     </main>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHtvLu74wApqPjqoNAp13cCTaFIhmnM5wzvOiwL0-Fwq3Jxm18xa5mWrLLeDJDFujF/exec"; // Use the same one as login
-        
-        // 1. Initial Page Load
-        document.getElementById('nav-player-name').innerText = localStorage.getItem('playerName');
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHtvLu74wApqPjqoNAp13cCTaFIhmnM5wzvOiwL0-Fwq3Jxm18xa5mWrLLeDJDFujF/exec";
+        const CURRENT_PLAYER = localStorage.getItem('playerName');
+
+        // Initialize UI
+        document.getElementById('nav-player-name').innerText = CURRENT_PLAYER;
         document.getElementById('dash-status').innerText = localStorage.getItem('playerStatus');
 
-        // 2. Fetch League Table Data
+        // Fetch and Map League Data
         async function loadTable() {
             try {
                 const res = await fetch(SCRIPT_URL);
                 const data = await res.json();
                 const tbody = document.getElementById('league-table-body');
-                tbody.innerHTML = ""; // Clear loader
+                tbody.innerHTML = ""; 
 
                 data.forEach((player, index) => {
+                    const isMe = (player[0] === CURRENT_PLAYER);
+                    
+                    // Column Mapping: A=0, E=4, F=5, G=6, H=7, I=8, J=9
                     const row = `
-                        <tr class="border-t border-white/5 hover:bg-white/5 transition">
-                            <td class="p-3 font-bold">${index + 1}</td>
-                            <td class="p-3 font-bold text-white">${player[0]}</td>
-                            <td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td>
-                            <td class="p-3 font-bold text-blue-400">0</td>
+                        <tr class="border-t border-white/5 transition ${isMe ? 'player-row-highlight' : 'hover:bg-white/5'}">
+                            <td class="p-3 font-mono text-slate-500">${index + 1}</td>
+                            <td class="p-3 font-bold text-white">${player[0] || "Unknown"} ${isMe ? '<span class="text-[8px] ml-1 bg-blue-500 text-white px-1 rounded">YOU</span>' : ''}</td>
+                            <td class="p-3">${player[4] || 0}</td>
+                            <td class="p-3">${player[5] || 0}</td>
+                            <td class="p-3">${player[6] || 0}</td>
+                            <td class="p-3">${player[7] || 0}</td>
+                            <td class="p-3 ${player[8] < 0 ? 'text-red-400' : 'text-slate-400'}">${player[8] || 0}</td>
+                            <td class="p-3 font-bold text-blue-400">${player[9] || 0}</td>
                         </tr>`;
                     tbody.innerHTML += row;
                 });
-            } catch (err) { console.error("Table Error:", err); }
+            } catch (err) { 
+                console.error("Table Error:", err); 
+                document.getElementById('league-table-body').innerHTML = '<tr><td colspan="8" class="text-center py-10 text-red-500">Failed to load rankings.</td></tr>';
+            }
         }
+        
         loadTable();
 
-        // 3. Handle Score Submission
+        // Handle Result Submission
         document.getElementById('result-form').onsubmit = async function(e) {
             e.preventDefault();
             const btn = document.getElementById('submit-btn');
-            btn.disabled = true; btn.innerText = "Submitting...";
+            btn.disabled = true; 
+            btn.innerText = "Processing...";
 
             const payload = {
-                action: "submitResult", // We tell the script what we are doing
-                playerName: localStorage.getItem('playerName'),
-                playerRef: localStorage.getItem('playerRef'),
+                action: "submitResult",
+                playerName: CURRENT_PLAYER,
                 opponent: document.getElementById('opp-name').value,
                 myScore: document.getElementById('my-score').value,
                 oppScore: document.getElementById('opp-score').value,
@@ -131,16 +143,19 @@
             };
 
             try {
-                await fetch(SCRIPT_URL, {
+                const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
                     body: JSON.stringify(payload)
                 });
-                alert("Result submitted! Verification takes 1-2 hours.");
+                
+                alert("Match submitted successfully! It will appear on the table once the admin verifies the screenshot.");
                 document.getElementById('result-form').reset();
             } catch (err) {
-                alert("Submission failed. Error: " + err.message);
+                alert("Submission failed. Check your connection.");
+                console.error(err);
             } finally {
-                btn.disabled = false; btn.innerText = "Submit Result";
+                btn.disabled = false; 
+                btn.innerText = "Submit Result";
             }
         };
     </script>
