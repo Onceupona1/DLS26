@@ -30,24 +30,39 @@
             justify-content: center;
             font-weight: bold;
         }
+        .rank-badge.gold { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .rank-badge.silver { background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%); }
+        .rank-badge.bronze { background: linear-gradient(135deg, #b45309 0%, #92400e 100%); }
         .stat-card {
             background: rgba(30, 41, 59, 0.6);
             border: 1px solid rgba(59, 130, 246, 0.2);
             border-radius: 1rem;
             padding: 1.5rem;
         }
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .tournament-banner {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.1) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.4);
         }
-        .animate-in {
-            animation: slideIn 0.5s ease forwards;
+        .waiting-banner {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.1) 100%);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-in { animation: slideIn 0.5s ease forwards; }
+        .pulse-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #10b981;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.3); }
+        }
+        .progress-bar-fill {
+            transition: width 1s ease;
         }
     </style>
 </head>
@@ -78,6 +93,26 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-4 py-8 relative z-10">
+
+        <!-- Tournament Status Banner -->
+        <div id="tournamentBanner" class="rounded-2xl p-5 mb-6 hidden">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="pulse-dot" id="statusDot"></div>
+                    <div>
+                        <p id="bannerTitle" class="font-black text-lg"></p>
+                        <p id="bannerSub" class="text-sm opacity-70"></p>
+                    </div>
+                </div>
+                <div id="progressSection" class="hidden">
+                    <p class="text-xs text-slate-400 mb-1 text-right"><span id="playerCountText"></span></p>
+                    <div class="w-48 h-2 bg-slate-700 rounded-full overflow-hidden">
+                        <div id="progressBar" class="progress-bar-fill h-full bg-gradient-to-r from-blue-500 to-blue-400 rounded-full" style="width:0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Welcome Section -->
         <div class="glass rounded-3xl p-8 mb-8 border-l-4 border-blue-500">
             <h2 class="text-3xl font-black mb-2">Welcome back, <span id="welcomeName" class="text-blue-400"></span>! 🎮</h2>
@@ -108,6 +143,7 @@
         <div class="grid lg:grid-cols-3 gap-8">
             <!-- Left Column -->
             <div class="lg:col-span-2 space-y-8">
+
                 <!-- League Standings -->
                 <div class="glass rounded-2xl p-6 card-hover">
                     <h3 class="text-xl font-black mb-6 flex items-center gap-2">
@@ -119,13 +155,14 @@
                                 <tr class="text-slate-400 text-xs uppercase">
                                     <th class="text-left py-3 px-2">#</th>
                                     <th class="text-left py-3 px-2">Player</th>
+                                    <th class="text-center py-3 px-2">MP</th>
                                     <th class="text-center py-3 px-2">PTS</th>
                                     <th class="text-center py-3 px-2">GD</th>
                                     <th class="text-center py-3 px-2">GF</th>
                                 </tr>
                             </thead>
                             <tbody id="standingsTable" class="divide-y divide-slate-700">
-                                <tr><td colspan="5" class="text-center py-8 text-slate-500">Loading...</td></tr>
+                                <tr><td colspan="6" class="text-center py-8 text-slate-500">Loading...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -137,7 +174,7 @@
                         📅 <span>Your Next Fixtures</span>
                     </h3>
                     <div id="fixturesList" class="space-y-3">
-                        <p class="text-slate-500 text-center py-8">No upcoming fixtures</p>
+                        <p class="text-slate-500 text-center py-8">Loading fixtures...</p>
                     </div>
                 </div>
 
@@ -147,7 +184,7 @@
                         🏆 <span>Your Last 5 Games</span>
                     </h3>
                     <div id="last5Games" class="space-y-3">
-                        <p class="text-slate-500 text-center py-8">No completed games yet</p>
+                        <p class="text-slate-500 text-center py-8">Loading games...</p>
                     </div>
                 </div>
             </div>
@@ -159,35 +196,31 @@
                     <h3 class="text-xl font-black mb-6 flex items-center gap-2">
                         📸 <span>Submit Result</span>
                     </h3>
-                    <form id="submitForm" class="space-y-4">
+                    <div id="submitForm" class="space-y-4">
                         <div>
                             <label class="text-xs font-bold text-slate-400 uppercase mb-2 block">Opponent</label>
                             <input id="opponent" placeholder="Opponent name" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-lg focus:border-blue-500 outline-none text-white" />
                         </div>
-
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="text-xs font-bold text-slate-400 uppercase mb-2 block">Your Score</label>
-                                <input id="myScore" type="number" min="0" placeholder="0" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-lg focus:border-blue-500 outline-none text-white text-center" />
+                                <input id="myScore" type="number" min="0" value="0" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-lg focus:border-blue-500 outline-none text-white text-center" />
                             </div>
                             <div>
                                 <label class="text-xs font-bold text-slate-400 uppercase mb-2 block">Opp Score</label>
-                                <input id="oppScore" type="number" min="0" placeholder="0" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-lg focus:border-blue-500 outline-none text-white text-center" />
+                                <input id="oppScore" type="number" min="0" value="0" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-lg focus:border-blue-500 outline-none text-white text-center" />
                             </div>
                         </div>
-
                         <div>
                             <label class="text-xs font-bold text-slate-400 uppercase mb-2 block">Screenshot</label>
                             <input id="screenshot" type="file" accept="image/*" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-lg focus:border-blue-500 outline-none text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white cursor-pointer" />
                             <p class="text-xs text-slate-500 mt-2">Max 5MB image</p>
                         </div>
-
-                        <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold py-3 rounded-lg hover:shadow-lg transition mt-6">
+                        <button onclick="handleSubmit()" class="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold py-3 rounded-lg hover:shadow-lg transition mt-6">
                             ✅ Submit for Approval
                         </button>
-
                         <div id="submitMsg" class="hidden p-4 rounded-lg text-sm font-medium"></div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -197,83 +230,167 @@
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHtvLu74wApqPjqoNAp13cCTaFIhmnM5wzvOiwL0-Fwq3Jxm18xa5mWrLLeDJDFujF/exec";
         const playerName = localStorage.getItem("playerName") || "Player";
 
-        // Set player name
         document.getElementById("playerName").innerText = playerName;
         document.getElementById("welcomeName").innerText = playerName;
 
-        // Load dashboard data
+        /* =====================
+           LOAD DASHBOARD
+        ===================== */
         async function loadDashboard() {
             try {
-                // Get standings
-                const standingsRes = await fetch(SCRIPT_URL + "?action=getStandings&t=" + Date.now());
+                const [statusRes, standingsRes, fixturesRes, gamesRes] = await Promise.all([
+                    fetch(SCRIPT_URL + "?action=getTournamentStatus&t=" + Date.now()),
+                    fetch(SCRIPT_URL + "?action=getStandings&t=" + Date.now()),
+                    fetch(SCRIPT_URL + "?action=getFixtures&player=" + encodeURIComponent(playerName) + "&t=" + Date.now()),
+                    fetch(SCRIPT_URL + "?action=getMatches&player=" + encodeURIComponent(playerName) + "&t=" + Date.now())
+                ]);
+
+                const status = await statusRes.json();
                 const standings = await standingsRes.json();
-                renderStandings(standings);
-
-                // Get fixtures
-                const fixturesRes = await fetch(SCRIPT_URL + "?action=getFixtures&player=" + encodeURIComponent(playerName) + "&t=" + Date.now());
                 const fixtures = await fixturesRes.json();
-                renderFixtures(fixtures);
-
-                // Get last 5 games
-                const gamesRes = await fetch(SCRIPT_URL + "?action=getMatches&player=" + encodeURIComponent(playerName) + "&t=" + Date.now());
                 const games = await gamesRes.json();
+
+                renderBanner(status);
+                renderStandings(standings);
+                renderFixtures(fixtures, status);
                 renderLastGames(games);
             } catch (err) {
                 console.error("Load error:", err);
             }
         }
 
+        /* =====================
+           TOURNAMENT BANNER
+        ===================== */
+        function renderBanner(status) {
+            const banner = document.getElementById("tournamentBanner");
+            const title = document.getElementById("bannerTitle");
+            const sub = document.getElementById("bannerSub");
+            const dot = document.getElementById("statusDot");
+            const progressSection = document.getElementById("progressSection");
+            const progressBar = document.getElementById("progressBar");
+            const playerCountText = document.getElementById("playerCountText");
+
+            banner.classList.remove("hidden");
+
+            if (status.status === "live") {
+                banner.className = "tournament-banner rounded-2xl p-5 mb-6";
+                dot.style.background = "#10b981";
+                title.innerText = "🏆 Tournament is LIVE!";
+                sub.innerText = "All fixtures have been generated. Play your matches!";
+                progressSection.classList.add("hidden");
+            } else if (status.status === "waiting") {
+                banner.className = "waiting-banner rounded-2xl p-5 mb-6";
+                dot.style.background = "#f59e0b";
+                title.innerText = "⏳ Waiting for Players";
+                const remaining = status.maxPlayers - status.playerCount;
+                sub.innerText = `${remaining} more player${remaining !== 1 ? 's' : ''} needed to start the tournament`;
+                progressSection.classList.remove("hidden");
+                playerCountText.innerText = `${status.playerCount} / ${status.maxPlayers} players registered`;
+                const pct = (status.playerCount / status.maxPlayers) * 100;
+                setTimeout(() => { progressBar.style.width = pct + "%"; }, 100);
+            } else if (status.status === "ended") {
+                banner.className = "rounded-2xl p-5 mb-6";
+                banner.style.background = "rgba(99,102,241,0.1)";
+                banner.style.border = "1px solid rgba(99,102,241,0.4)";
+                dot.style.background = "#818cf8";
+                title.innerText = "🎉 League Ended";
+                sub.innerText = "Check the final standings for the winner!";
+                progressSection.classList.add("hidden");
+            }
+        }
+
+        /* =====================
+           STANDINGS
+        ===================== */
         function renderStandings(standings) {
             const table = document.getElementById("standingsTable");
             if (!standings || standings.length === 0) {
-                table.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-slate-500">No standings yet</td></tr>';
+                table.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-slate-500">No standings yet</td></tr>';
                 return;
             }
 
+            const badgeClass = (pos) => pos === 1 ? 'gold' : pos === 2 ? 'silver' : pos === 3 ? 'bronze' : '';
+
             let html = standings.map((p, i) => {
                 const isPlayer = p.name === playerName;
+                const pos = p.pos || i + 1;
                 return `
                     <tr class="${isPlayer ? 'bg-blue-600/10 border-l-2 border-blue-500' : ''} hover:bg-slate-800/50 transition">
                         <td class="py-3 px-2">
-                            <div class="rank-badge">${p.pos || i + 1}</div>
+                            <div class="rank-badge ${badgeClass(pos)}">${pos}</div>
                         </td>
                         <td class="py-3 px-2 font-semibold">${p.name}${isPlayer ? ' 👤' : ''}</td>
+                        <td class="py-3 px-2 text-center text-slate-300">${p.matches || 0}</td>
                         <td class="py-3 px-2 text-center text-green-400 font-bold">${p.pts || 0}</td>
-                        <td class="py-3 px-2 text-center text-purple-400 font-bold">${p.gd || 0}</td>
+                        <td class="py-3 px-2 text-center text-purple-400 font-bold">${p.gd >= 0 ? '+' : ''}${p.gd || 0}</td>
                         <td class="py-3 px-2 text-center text-orange-400">${p.gf || 0}</td>
                     </tr>
                 `;
             }).join("");
             table.innerHTML = html;
 
-            // Update player stats
+            // Update stat cards
             const player = standings.find(p => p.name === playerName);
             if (player) {
                 document.getElementById("playerPos").innerText = player.pos || "-";
                 document.getElementById("playerPts").innerText = player.pts || 0;
-                document.getElementById("playerGD").innerText = player.gd || 0;
+                document.getElementById("playerGD").innerText = (player.gd >= 0 ? "+" : "") + (player.gd || 0);
                 document.getElementById("playerMatches").innerText = player.matches || 0;
             }
         }
 
-        function renderFixtures(fixtures) {
+        /* =====================
+           FIXTURES
+        ===================== */
+        function renderFixtures(fixtures, status) {
             const list = document.getElementById("fixturesList");
+
+            if (status && status.status === "waiting") {
+                list.innerHTML = `
+                    <div class="text-center py-8">
+                        <p class="text-4xl mb-3">⏳</p>
+                        <p class="text-slate-400 font-semibold">Fixtures will be generated once all 20 players have joined.</p>
+                        <p class="text-slate-500 text-sm mt-1">${status.maxPlayers - status.playerCount} spot${status.maxPlayers - status.playerCount !== 1 ? 's' : ''} remaining</p>
+                    </div>`;
+                return;
+            }
+
             if (!fixtures || fixtures.length === 0) {
                 list.innerHTML = '<p class="text-slate-500 text-center py-8">No upcoming fixtures</p>';
                 return;
             }
 
-            let html = fixtures.map(f => `
-                <div class="bg-slate-800/50 p-4 rounded-lg hover:bg-slate-800 transition">
-                    <div class="flex justify-between items-center">
-                        <span class="font-semibold">${f.Home_Player} vs ${f.Away_Player}</span>
-                        <span class="text-xs bg-blue-600/30 text-blue-300 px-3 py-1 rounded-full">${new Date(f.Date).toLocaleDateString()}</span>
+            let html = fixtures.map(f => {
+                const isHome = f.home_player === playerName;
+                const opponent = isHome ? f.away_player : f.home_player;
+                const matchDate = f.date ? new Date(f.date) : null;
+                const dateStr = matchDate ? matchDate.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }) : "TBD";
+                const timeStr = matchDate ? matchDate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : "";
+
+                return `
+                    <div class="bg-slate-800/50 p-4 rounded-lg hover:bg-slate-800 transition border-l-2 border-blue-500/50">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="font-semibold text-white">${f.home_player}</span>
+                                <span class="text-slate-400 mx-2 text-xs">vs</span>
+                                <span class="font-semibold text-white">${f.away_player}</span>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs bg-blue-600/30 text-blue-300 px-3 py-1 rounded-full">${dateStr}</p>
+                                ${timeStr ? `<p class="text-xs text-slate-400 mt-1 text-right">${timeStr}</p>` : ''}
+                            </div>
+                        </div>
+                        ${f.notes ? `<p class="text-xs text-slate-500 mt-2">${f.notes}</p>` : ''}
                     </div>
-                </div>
-            `).join("");
+                `;
+            }).join("");
             list.innerHTML = html;
         }
 
+        /* =====================
+           LAST 5 GAMES
+        ===================== */
         function renderLastGames(games) {
             const list = document.getElementById("last5Games");
             if (!games || games.length === 0) {
@@ -282,49 +399,65 @@
             }
 
             let html = games.map(g => {
-                const isHome = g.Home_Player === playerName;
-                const won = isHome ? g.Home_Score > g.Away_Score : g.Away_Score > g.Home_Score;
-                const result = won ? '✅ WIN' : g.Home_Score === g.Away_Score ? '🤝 DRAW' : '❌ LOSS';
+                // Support both lowercase and capitalized header names
+                const homePlayer = g.home_player || g.Home_Player || "";
+                const awayPlayer = g.away_player || g.Away_Player || "";
+                const homeScore = g.home_score ?? g.Home_Score ?? 0;
+                const awayScore = g.away_score ?? g.Away_Score ?? 0;
+                const dateVal = g.date || g.Date || "";
+
+                const isHome = homePlayer === playerName;
+                const myScore = isHome ? homeScore : awayScore;
+                const theirScore = isHome ? awayScore : homeScore;
+                const won = myScore > theirScore;
+                const draw = myScore === theirScore;
+                const result = won ? '✅ WIN' : draw ? '🤝 DRAW' : '❌ LOSS';
+                const borderColor = won ? 'border-green-500' : draw ? 'border-yellow-500' : 'border-red-500/50';
+
                 return `
-                    <div class="bg-slate-800/50 p-4 rounded-lg hover:bg-slate-800 transition border-l-2 ${won ? 'border-green-500' : 'border-slate-600'}">
+                    <div class="bg-slate-800/50 p-4 rounded-lg hover:bg-slate-800 transition border-l-2 ${borderColor}">
                         <div class="flex justify-between items-center mb-2">
-                            <span class="font-semibold text-sm">${g.Home_Player} ${g.Home_Score} - ${g.Away_Score} ${g.Away_Player}</span>
-                            <span class="text-xs">${result}</span>
+                            <span class="font-semibold text-sm">${homePlayer} <span class="text-blue-400">${homeScore}</span> - <span class="text-blue-400">${awayScore}</span> ${awayPlayer}</span>
+                            <span class="text-xs font-bold">${result}</span>
                         </div>
-                        <p class="text-xs text-slate-500">${new Date(g.Date).toLocaleDateString()}</p>
+                        <p class="text-xs text-slate-500">${dateVal ? new Date(dateVal).toLocaleDateString() : ""}</p>
                     </div>
                 `;
             }).join("");
             list.innerHTML = html;
         }
 
-        // Submit form
-        document.getElementById("submitForm").onsubmit = async (e) => {
-            e.preventDefault();
+        /* =====================
+           SUBMIT RESULT
+        ===================== */
+        async function handleSubmit() {
             const msg = document.getElementById("submitMsg");
             const screenshotFile = document.getElementById("screenshot").files[0];
+            const opponent = document.getElementById("opponent").value.trim();
 
+            if (!opponent) {
+                showMsg(msg, "❌ Please enter the opponent name", "error");
+                return;
+            }
             if (!screenshotFile) {
                 showMsg(msg, "❌ Please upload a screenshot", "error");
                 return;
             }
-
             if (screenshotFile.size > 5 * 1024 * 1024) {
                 showMsg(msg, "❌ File must be less than 5MB", "error");
                 return;
             }
 
-            // Convert to base64
             const reader = new FileReader();
             reader.onload = async () => {
                 try {
                     const payload = {
                         action: "submitResult",
-                        playerName: playerName,
-                        opponent: document.getElementById("opponent").value,
+                        playerName,
+                        opponent,
                         myScore: document.getElementById("myScore").value,
                         oppScore: document.getElementById("oppScore").value,
-                        ssLink: reader.result // Base64
+                        ssLink: reader.result
                     };
 
                     const res = await fetch(SCRIPT_URL, {
@@ -334,22 +467,29 @@
 
                     const data = await res.json();
                     showMsg(msg, "✅ Submitted! Waiting for admin approval", "success");
-                    
+
                     setTimeout(() => {
-                        document.getElementById("submitForm").reset();
+                        document.getElementById("opponent").value = "";
+                        document.getElementById("myScore").value = "0";
+                        document.getElementById("oppScore").value = "0";
+                        document.getElementById("screenshot").value = "";
                         msg.classList.add("hidden");
                         loadDashboard();
-                    }, 2000);
+                    }, 2500);
                 } catch (err) {
                     showMsg(msg, "❌ Submission failed. Try again.", "error");
                 }
             };
             reader.readAsDataURL(screenshotFile);
-        };
+        }
 
         function showMsg(el, text, type) {
             el.textContent = text;
-            el.className = type === "error" ? "bg-red-900/30 text-red-300 border border-red-500/30" : "bg-green-900/30 text-green-300 border border-green-500/30";
+            el.className = "p-4 rounded-lg text-sm font-medium " + (
+                type === "error"
+                    ? "bg-red-900/30 text-red-300 border border-red-500/30"
+                    : "bg-green-900/30 text-green-300 border border-green-500/30"
+            );
             el.classList.remove("hidden");
         }
 
@@ -358,7 +498,6 @@
             window.location.href = "login.html";
         }
 
-        // Load on mount
         loadDashboard();
     </script>
 </body>
