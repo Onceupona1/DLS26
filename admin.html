@@ -109,7 +109,7 @@
     <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center flex-wrap gap-3">
       <div>
         <h1 class="text-xl font-black">DLS<span class="text-blue-500">26</span> <span class="text-slate-400 font-semibold text-sm">Admin</span></h1>
-        <p class="text-xs text-slate-500">isaacawartey123@gmail.com</p>
+        <p class="text-xs text-slate-500"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="80e9f3e1e1e3e1f7e1f2f4e5f9b1b2b3c0e7ede1e9ecaee3efed">[email&#160;protected]</a></p>
       </div>
       <div class="flex items-center gap-3">
         <div id="statusPill" class="text-xs px-3 py-1 rounded-full font-bold border">–</div>
@@ -235,9 +235,9 @@
   </main>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHtvLu74wApqPjqoNAp13cCTaFIhmnM5wzvOiwL0-Fwq3Jxm18xa5mWrLLeDJDFujF/exec";
-const PASS = "*Goats@123";
+const PASS        = "*Goats@123";   // what admin types
 let adminPass = null, pendingRow = null;
 
 /* ---- LOGIN ---- */
@@ -324,9 +324,24 @@ async function loadPending() {
   }).join("");
 }
 async function approveMatch(rowIndex){
-  const r=await apPost({action:"adminApprove",rowIndex});
-  if(r.error){toast("Error: "+r.error,"err");return;}
-  toast("Match approved ✅","ok"); loadAll();
+  const r = await apPost({action:"adminApprove", rowIndex});
+  if(r.error){ toast("Error: "+r.error, "err"); return; }
+
+  if(r.tournamentEnded){
+    toast("🏆 All fixtures done! Tournament has ended automatically.", "ok");
+    // Give the toast a moment then reload everything including status
+    setTimeout(loadAll, 500);
+    return;
+  }
+
+  // Show progress if available
+  if(r.fixturesTotal){
+    const remaining = r.fixturesTotal - r.fixturesCompleted;
+    toast("Match approved ✅  —  " + remaining + " fixture" + (remaining!==1?"s":"") + " remaining", "ok");
+  } else {
+    toast("Match approved ✅", "ok");
+  }
+  loadAll();
 }
 function openRejectModal(rowIndex){
   pendingRow=rowIndex;
@@ -439,17 +454,3 @@ function toast(msg,type="ok"){
   const el=document.getElementById("toast");
   el.innerText=msg; el.className="show "+type;
   setTimeout(()=>{el.className=type;},3000);
-}
-
-/* ---- ESCAPE ---- */
-function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
-
-/* ---- AUTO-REFRESH ---- */
-setInterval(()=>{if(adminPass)loadAll();},90000);
-</script>
-</body>
-</html>
-</script>
-
-</body>
-</html>
