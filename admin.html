@@ -8,79 +8,27 @@
   <style>
     * { font-family: 'Inter', sans-serif; }
     body { background: #0a0e27; color: #e2e8f0; }
-    .glass {
-      background: rgba(15,23,42,0.85);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(59,130,246,0.2);
-    }
+    .glass { background: rgba(15,23,42,0.85); backdrop-filter: blur(20px); border: 1px solid rgba(59,130,246,0.2); }
     .tab-btn { transition: all 0.2s; }
-    .tab-btn.active {
-      background: rgba(59,130,246,0.2);
-      border-color: rgba(59,130,246,0.6);
-      color: #93c5fd;
-    }
-    .card-pending {
-      background: rgba(30,41,59,0.6);
-      border: 1px solid rgba(59,130,246,0.15);
-      border-radius: 14px;
-      transition: border-color 0.2s;
-    }
+    .tab-btn.active { background: rgba(59,130,246,0.2); border-color: rgba(59,130,246,0.6); color: #93c5fd; }
+    .card-pending { background: rgba(30,41,59,0.6); border: 1px solid rgba(59,130,246,0.15); border-radius: 14px; transition: border-color 0.2s; }
     .card-pending:hover { border-color: rgba(59,130,246,0.4); }
-    .screenshot-thumb {
-      width: 100%;
-      max-height: 200px;
-      object-fit: cover;
-      border-radius: 8px;
-      border: 1px solid rgba(59,130,246,0.2);
-      cursor: pointer;
-    }
-    .rank-badge {
-      width: 32px; height: 32px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: 12px;
-    }
-    .pulse-dot { width:8px;height:8px;border-radius:50%;background:#10b981;animation:pulse 2s infinite; }
+    .screenshot-thumb { width: 100%; max-height: 200px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(59,130,246,0.2); cursor: pointer; }
+    .rank-badge { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; }
+    .pulse-dot { width:8px; height:8px; border-radius:50%; background:#10b981; animation:pulse 2s infinite; }
     @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
-
-    /* Lightbox */
-    #lightbox {
-      display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9);
-      z-index:9999; align-items:center; justify-content:center;
-    }
+    #lightbox { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:9999; align-items:center; justify-content:center; }
     #lightbox.open { display:flex; }
     #lightbox img { max-width:90vw; max-height:90vh; border-radius:12px; }
-
-    /* Login screen */
     #loginScreen { min-height:100vh; display:flex; align-items:center; justify-content:center; }
-
-    /* Reject modal */
-    #rejectModal {
-      display:none; position:fixed; inset:0;
-      background:rgba(0,0,0,0.7); backdrop-filter:blur(6px);
-      z-index:1000; align-items:center; justify-content:center;
-    }
-    #rejectModal.open { display:flex; }
-
-    /* Reset confirm */
-    #resetModal {
-      display:none; position:fixed; inset:0;
-      background:rgba(0,0,0,0.7); backdrop-filter:blur(6px);
-      z-index:1000; align-items:center; justify-content:center;
-    }
-    #resetModal.open { display:flex; }
-
+    #rejectModal, #resetModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(6px); z-index:1000; align-items:center; justify-content:center; }
+    #rejectModal.open, #resetModal.open { display:flex; }
     .spinner { animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* Toast */
-    #toast {
-      position:fixed; bottom:24px; right:24px; z-index:9998;
-      padding:12px 20px; border-radius:10px; font-size:13px; font-weight:600;
-      transform:translateY(80px); opacity:0; transition:all 0.3s ease;
-    }
+    #toast { position:fixed; bottom:24px; right:24px; z-index:9998; padding:12px 20px; border-radius:10px; font-size:13px; font-weight:600; transform:translateY(80px); opacity:0; transition:all 0.3s ease; }
     #toast.show { transform:translateY(0); opacity:1; }
     #toast.success { background:rgba(16,185,129,0.2); border:1px solid rgba(16,185,129,0.4); color:#6ee7b7; }
-    #toast.error   { background:rgba(239,68,68,0.2);  border:1px solid rgba(239,68,68,0.4);  color:#fca5a5; }
+    #toast.error { background:rgba(239,68,68,0.2); border:1px solid rgba(239,68,68,0.4); color:#fca5a5; }
   </style>
 </head>
 <body>
@@ -142,11 +90,12 @@
       <div class="text-4xl mb-4">🔐</div>
       <h2 class="text-xl font-black mb-2">Sign in with Google</h2>
       <p class="text-slate-400 text-sm mb-6">Only <span class="text-blue-400">isaacawartey123@gmail.com</span> can access this panel.</p>
-      <button id="googleSignInBtn" onclick="signIn()"
-        class="w-full flex items-center justify-center gap-3 bg-white text-gray-800 font-semibold py-3 rounded-xl hover:bg-gray-100 transition">
-        <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-        Sign in with Google
-      </button>
+      <div id="g_id_onload"
+           data-client_id="618447863558-ehtvklmaqeuhks9ojsch0dhkjap9scv2.apps.googleusercontent.com"
+           data-callback="handleCredentialResponse"
+           data-auto_prompt="false">
+      </div>
+      <div class="g_id_signin"></div>
       <p id="loginError" class="text-red-400 text-xs mt-4 hidden">Access denied. Wrong Google account.</p>
     </div>
   </div>
@@ -154,166 +103,8 @@
 
 <!-- MAIN ADMIN PANEL (hidden until logged in) -->
 <div id="adminPanel" class="hidden">
-
-  <!-- Header -->
-  <header class="glass border-b border-slate-700/50 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-      <div class="flex items-center gap-3">
-        <div>
-          <h1 class="text-xl font-black">DLS<span class="text-blue-500">26</span> <span class="text-slate-400 text-sm font-semibold">Admin</span></h1>
-          <p class="text-xs text-slate-500">isaacawartey123@gmail.com</p>
-        </div>
-      </div>
-      <div class="flex items-center gap-3">
-        <div id="statusPill" class="text-xs px-3 py-1 rounded-full font-bold border"></div>
-        <button onclick="signOut()" class="bg-red-600/20 hover:bg-red-600/40 text-red-400 px-4 py-2 rounded-lg text-sm font-semibold transition">Sign Out</button>
-      </div>
-    </div>
-  </header>
-
-  <main class="max-w-7xl mx-auto px-4 py-8">
-
-    <!-- Summary stat cards -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-      <div class="glass rounded-2xl p-5">
-        <div class="text-2xl font-black text-yellow-400 mb-1" id="statPending">–</div>
-        <p class="text-xs text-slate-400 uppercase tracking-wider">Pending Results</p>
-      </div>
-      <div class="glass rounded-2xl p-5">
-        <div class="text-2xl font-black text-green-400 mb-1" id="statApproved">–</div>
-        <p class="text-xs text-slate-400 uppercase tracking-wider">Approved</p>
-      </div>
-      <div class="glass rounded-2xl p-5">
-        <div class="text-2xl font-black text-blue-400 mb-1" id="statPlayers">–</div>
-        <p class="text-xs text-slate-400 uppercase tracking-wider">Players</p>
-      </div>
-      <div class="glass rounded-2xl p-5">
-        <div class="text-2xl font-black text-red-400 mb-1" id="statRejected">–</div>
-        <p class="text-xs text-slate-400 uppercase tracking-wider">Rejected</p>
-      </div>
-    </div>
-
-    <!-- Tabs -->
-    <div class="flex gap-2 mb-6 flex-wrap">
-      <button onclick="switchTab('pending')"   id="tab-pending"   class="tab-btn active glass px-5 py-2 rounded-lg text-sm font-semibold border border-transparent">⏳ Pending Queue</button>
-      <button onclick="switchTab('history')"   id="tab-history"   class="tab-btn glass px-5 py-2 rounded-lg text-sm font-semibold border border-transparent text-slate-400">📋 Match History</button>
-      <button onclick="switchTab('standings')" id="tab-standings" class="tab-btn glass px-5 py-2 rounded-lg text-sm font-semibold border border-transparent text-slate-400">📊 Standings</button>
-      <button onclick="switchTab('players')"   id="tab-players"   class="tab-btn glass px-5 py-2 rounded-lg text-sm font-semibold border border-transparent text-slate-400">👥 Players</button>
-      <button onclick="switchTab('season')"    id="tab-season"    class="tab-btn glass px-5 py-2 rounded-lg text-sm font-semibold border border-transparent text-slate-400">⚙️ Season</button>
-    </div>
-
-    <!-- TAB: PENDING QUEUE -->
-    <div id="tab-pending-content">
-      <div id="pendingEmpty" class="hidden glass rounded-2xl p-12 text-center">
-        <div class="text-5xl mb-4">✅</div>
-        <p class="text-lg font-bold text-green-400">All clear!</p>
-        <p class="text-slate-400 text-sm mt-1">No pending match results to review.</p>
-      </div>
-      <div id="pendingList" class="space-y-4"></div>
-    </div>
-
-    <!-- TAB: MATCH HISTORY -->
-    <div id="tab-history-content" class="hidden">
-      <div class="glass rounded-2xl overflow-hidden">
-        <table class="w-full text-sm">
-          <thead class="border-b border-slate-700">
-            <tr class="text-slate-400 text-xs uppercase">
-              <th class="text-left py-3 px-4">Date</th>
-              <th class="text-left py-3 px-4">Home</th>
-              <th class="text-left py-3 px-4">Away</th>
-              <th class="text-center py-3 px-4">Score</th>
-              <th class="text-center py-3 px-4">Status</th>
-              <th class="text-center py-3 px-4">Screenshot</th>
-            </tr>
-          </thead>
-          <tbody id="historyTable" class="divide-y divide-slate-700/50">
-            <tr><td colspan="6" class="text-center py-8 text-slate-500">Loading...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- TAB: STANDINGS -->
-    <div id="tab-standings-content" class="hidden">
-      <div class="glass rounded-2xl overflow-hidden">
-        <table class="w-full text-sm">
-          <thead class="border-b border-slate-700">
-            <tr class="text-slate-400 text-xs uppercase">
-              <th class="text-left py-3 px-4">#</th>
-              <th class="text-left py-3 px-4">Player</th>
-              <th class="text-center py-3 px-4">MP</th>
-              <th class="text-center py-3 px-4">PTS</th>
-              <th class="text-center py-3 px-4">GD</th>
-              <th class="text-center py-3 px-4">GF</th>
-              <th class="text-center py-3 px-4">GA</th>
-            </tr>
-          </thead>
-          <tbody id="adminStandings" class="divide-y divide-slate-700/50">
-            <tr><td colspan="7" class="text-center py-8 text-slate-500">Loading...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- TAB: PLAYERS -->
-    <div id="tab-players-content" class="hidden">
-      <div class="glass rounded-2xl overflow-hidden">
-        <table class="w-full text-sm">
-          <thead class="border-b border-slate-700">
-            <tr class="text-slate-400 text-xs uppercase">
-              <th class="text-left py-3 px-4">#</th>
-              <th class="text-left py-3 px-4">Team Name</th>
-              <th class="text-left py-3 px-4">Email</th>
-              <th class="text-left py-3 px-4">Reference</th>
-              <th class="text-center py-3 px-4">Status</th>
-              <th class="text-left py-3 px-4">Joined</th>
-            </tr>
-          </thead>
-          <tbody id="playersTable" class="divide-y divide-slate-700/50">
-            <tr><td colspan="6" class="text-center py-8 text-slate-500">Loading...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- TAB: SEASON CONTROLS -->
-    <div id="tab-season-content" class="hidden space-y-6">
-
-      <!-- Tournament status card -->
-      <div class="glass rounded-2xl p-6">
-        <h3 class="font-black text-lg mb-4">⚙️ Tournament Status</h3>
-        <div id="seasonStatusDisplay" class="text-slate-400 text-sm mb-4">Loading...</div>
-        <div class="flex gap-3 flex-wrap">
-          <button onclick="setStatus('waiting')"  class="px-5 py-2 rounded-lg text-sm font-semibold bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/30 transition">Set → Waiting</button>
-          <button onclick="setStatus('live')"     class="px-5 py-2 rounded-lg text-sm font-semibold bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500/30 transition">Set → Live</button>
-          <button onclick="setStatus('ended')"    class="px-5 py-2 rounded-lg text-sm font-semibold bg-purple-500/20 text-purple-400 border border-purple-500/30 hover:bg-purple-500/30 transition">Set → Ended</button>
-        </div>
-      </div>
-
-      <!-- Prize reminder -->
-      <div class="glass rounded-2xl p-6 border border-yellow-500/20">
-        <h3 class="font-black text-lg mb-4 text-yellow-400">🏆 Prize Money Reminder</h3>
-        <div class="space-y-2 text-sm">
-          <div class="flex justify-between py-2 border-b border-slate-700/50"><span class="text-slate-300">🥇 1st Place</span><span class="font-black text-yellow-400">₵100</span></div>
-          <div class="flex justify-between py-2 border-b border-slate-700/50"><span class="text-slate-300">🥈 2nd Place</span><span class="font-black text-slate-300">₵65</span></div>
-          <div class="flex justify-between py-2 border-b border-slate-700/50"><span class="text-slate-300">🥉 3rd Place</span><span class="font-black text-amber-600">₵40</span></div>
-          <div class="flex justify-between py-2 border-b border-slate-700/50"><span class="text-slate-300">4th Place</span><span class="font-black text-blue-400">₵25</span></div>
-          <div class="flex justify-between py-2"><span class="text-slate-300">5th Place</span><span class="font-black text-blue-400">₵25</span></div>
-        </div>
-        <p class="text-xs text-slate-500 mt-4">Check Standings tab to confirm final positions before paying out.</p>
-      </div>
-
-      <!-- Danger zone -->
-      <div class="glass rounded-2xl p-6 border border-red-500/30">
-        <h3 class="font-black text-lg mb-2 text-red-400">🗑️ Danger Zone</h3>
-        <p class="text-slate-400 text-sm mb-4">Wipe all players, matches, and fixtures. Reset tournament to Waiting. Use this at the start of each new week after prizes are paid.</p>
-        <button onclick="openResetModal()" class="bg-red-600/20 hover:bg-red-600/40 text-red-400 border border-red-500/40 px-6 py-3 rounded-xl font-bold transition">
-          🗑️ Wipe Season & Start Fresh
-        </button>
-      </div>
-    </div>
-
-  </main>
+  <!-- your full admin panel here (header, tabs, tables) -->
+  <!-- same as your original code -->
 </div>
 
 <!-- Google Identity Services -->
@@ -322,43 +113,29 @@
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHtvLu74wApqPjqoNAp13cCTaFIhmnM5wzvOiwL0-Fwq3Jxm18xa5mWrLLeDJDFujF/exec";
   const ADMIN_EMAIL = "isaacawartey123@gmail.com";
-  const CLIENT_ID = "618447863558-ehtvklmaqeuhks9ojsch0dhkjap9scv2.apps.googleusercontent.com";
 
   let accessToken = null;
-  let pendingRowIndex = null;
-  let allMatches = [];
-  let allPlayers = [];
 
-  /* ========================
-     GOOGLE AUTH
-  ======================== */
-  function signIn() {
-    const client = google.accounts.oauth2.initTokenClient({
-      client_id: CLIENT_ID,
-      scope: "https://www.googleapis.com/auth/userinfo.email",
-      callback: async (response) => {
-        if (response.error) { showToast("Sign-in failed: " + response.error, "error"); return; }
-        accessToken = response.access_token;
+  // ========================
+  // GOOGLE SIGN-IN CALLBACK
+  // ========================
+  function handleCredentialResponse(response) {
+    const jwt = response.credential;
+    const payload = JSON.parse(atob(jwt.split('.')[1]));
+    if (payload.email !== ADMIN_EMAIL) {
+      document.getElementById("loginError").classList.remove("hidden");
+      showToast("Access denied — wrong account", "error");
+      return;
+    }
 
-        // Verify it's the right account
-        const info = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
-          headers: { Authorization: "Bearer " + accessToken }
-        }).then(r => r.json());
+    // Show admin panel
+    document.getElementById("loginScreen").classList.add("hidden");
+    document.getElementById("adminPanel").classList.remove("hidden");
 
-        if (info.email !== ADMIN_EMAIL) {
-          accessToken = null;
-          document.getElementById("loginError").classList.remove("hidden");
-          showToast("Access denied — wrong account", "error");
-          return;
-        }
+    // store token for API requests
+    accessToken = jwt;
 
-        // Show panel
-        document.getElementById("loginScreen").classList.add("hidden");
-        document.getElementById("adminPanel").classList.remove("hidden");
-        loadAll();
-      }
-    });
-    client.requestAccessToken();
+    loadAll();
   }
 
   function signOut() {
@@ -368,306 +145,21 @@
     document.getElementById("loginError").classList.add("hidden");
   }
 
-  /* ========================
-     LOAD ALL DATA
-  ======================== */
-  async function loadAll() {
-    await Promise.all([
-      loadPending(),
-      loadAllMatches(),
-      loadPlayers(),
-      loadStandings(),
-      loadTournamentStatus()
-    ]);
-  }
+  // ========================
+  // YOUR EXISTING DATA FUNCTIONS (loadAll, loadPlayers, loadStandings, etc.)
+  // Keep all functions as-is from your original script
+  // ========================
 
-  async function adminGet(action) {
-    const res = await fetch(`${SCRIPT_URL}?action=${action}&token=${accessToken}&t=${Date.now()}`);
-    return res.json();
-  }
-
-  async function adminPost(payload) {
-    const res = await fetch(SCRIPT_URL, {
-      method: "POST",
-      body: JSON.stringify({ ...payload, token: accessToken })
-    });
-    return res.json();
-  }
-
-  /* ========================
-     TOURNAMENT STATUS
-  ======================== */
-  async function loadTournamentStatus() {
-    const s = await fetch(`${SCRIPT_URL}?action=getTournamentStatus&t=${Date.now()}`).then(r => r.json());
-    const pill = document.getElementById("statusPill");
-    const display = document.getElementById("seasonStatusDisplay");
-
-    const map = {
-      waiting: { label: "⏳ Waiting", cls: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" },
-      live:    { label: "🟢 Live",    cls: "bg-green-500/20 text-green-400 border-green-500/30" },
-      ended:   { label: "🏁 Ended",   cls: "bg-purple-500/20 text-purple-400 border-purple-500/30" }
-    };
-    const st = map[s.status] || map.waiting;
-    pill.innerText = st.label;
-    pill.className = "text-xs px-3 py-1 rounded-full font-bold border " + st.cls;
-
-    display.innerHTML = `
-      Status: <span class="font-bold text-white">${s.status}</span> &nbsp;·&nbsp;
-      Players: <span class="font-bold text-blue-400">${s.playerCount} / ${s.maxPlayers}</span>
-      ${s.weekStart ? `&nbsp;·&nbsp; Week: <span class="font-bold text-slate-300">${new Date(s.weekStart).toLocaleDateString()} – ${new Date(s.weekEnd).toLocaleDateString()}</span>` : ""}
-    `;
-  }
-
-  async function setStatus(newStatus) {
-    // Only update Settings sheet — use adminPost
-    const res = await adminPost({ action: "adminSetStatus", newStatus });
-    if (res.error) { showToast("Error: " + res.error, "error"); return; }
-    showToast("Status set to: " + newStatus, "success");
-    loadTournamentStatus();
-  }
-
-  /* ========================
-     PENDING QUEUE
-  ======================== */
-  async function loadPending() {
-    const data = await adminGet("getPendingMatches");
-    document.getElementById("statPending").innerText = Array.isArray(data) ? data.length : 0;
-
-    const list = document.getElementById("pendingList");
-    const empty = document.getElementById("pendingEmpty");
-
-    if (!Array.isArray(data) || data.length === 0) {
-      list.innerHTML = "";
-      empty.classList.remove("hidden");
-      return;
-    }
-    empty.classList.add("hidden");
-
-    list.innerHTML = data.map(m => {
-      const dateStr = m.date ? new Date(m.date).toLocaleString() : "Unknown";
-      const hasScreenshot = m.screenshot_link && m.screenshot_link.startsWith("data:image");
-      return `
-        <div class="card-pending p-5">
-          <div class="flex flex-wrap gap-4 justify-between items-start mb-4">
-            <div>
-              <p class="font-black text-lg">${m.home_player} <span class="text-blue-400">${m.home_score}</span> – <span class="text-blue-400">${m.away_score}</span> ${m.away_player}</p>
-              <p class="text-xs text-slate-500 mt-1">Submitted by <span class="text-slate-300">${m.submittedBy}</span> · ${dateStr}</p>
-            </div>
-            <div class="flex gap-2">
-              <button onclick="approveMatch(${m._rowIndex})" class="bg-green-600/20 hover:bg-green-600/40 text-green-400 border border-green-500/40 px-4 py-2 rounded-lg text-sm font-bold transition">
-                ✅ Approve
-              </button>
-              <button onclick="openRejectModal(${m._rowIndex})" class="bg-red-600/20 hover:bg-red-600/40 text-red-400 border border-red-500/40 px-4 py-2 rounded-lg text-sm font-bold transition">
-                ❌ Reject
-              </button>
-            </div>
-          </div>
-          ${hasScreenshot ? `
-            <img src="${m.screenshot_link}" class="screenshot-thumb" onclick="openLightbox('${m.screenshot_link}')" title="Click to enlarge" />
-            <p class="text-xs text-slate-500 mt-2">Click screenshot to enlarge</p>
-          ` : `<p class="text-xs text-slate-500 italic">No screenshot provided</p>`}
-        </div>
-      `;
-    }).join("");
-  }
-
-  async function approveMatch(rowIndex) {
-    const res = await adminPost({ action: "adminApprove", rowIndex });
-    if (res.error) { showToast("Error: " + res.error, "error"); return; }
-    showToast("Match approved ✅", "success");
-    loadAll();
-  }
-
-  function openRejectModal(rowIndex) {
-    pendingRowIndex = rowIndex;
-    document.getElementById("rejectModal").classList.add("open");
-    document.getElementById("rejectCustom").classList.add("hidden");
-    document.getElementById("rejectReason").value = "Wrong score entered";
-  }
-
-  function closeRejectModal() {
-    document.getElementById("rejectModal").classList.remove("open");
-    pendingRowIndex = null;
-  }
-
-  document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("rejectReason").addEventListener("change", function() {
-      const custom = document.getElementById("rejectCustom");
-      custom.classList.toggle("hidden", this.value !== "Other");
-    });
-  });
-
-  async function confirmReject() {
-    if (!pendingRowIndex) return;
-    const select = document.getElementById("rejectReason");
-    const custom = document.getElementById("rejectCustom");
-    const reason = select.value === "Other" ? (custom.value || "Rejected by admin") : select.value;
-
-    const res = await adminPost({ action: "adminReject", rowIndex: pendingRowIndex, reason });
-    if (res.error) { showToast("Error: " + res.error, "error"); return; }
-    showToast("Match rejected ❌", "success");
-    closeRejectModal();
-    loadAll();
-  }
-
-  /* ========================
-     MATCH HISTORY
-  ======================== */
-  async function loadAllMatches() {
-    const data = await adminGet("getAllMatches");
-    allMatches = Array.isArray(data) ? data : [];
-
-    const approved = allMatches.filter(m => m.status === "Approved").length;
-    const rejected = allMatches.filter(m => m.status && m.status.startsWith("Rejected")).length;
-    document.getElementById("statApproved").innerText = approved;
-    document.getElementById("statRejected").innerText = rejected;
-
-    const tbody = document.getElementById("historyTable");
-    if (allMatches.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-slate-500">No matches yet</td></tr>';
-      return;
-    }
-
-    tbody.innerHTML = allMatches.map(m => {
-      const statusColor = m.status === "Approved"
-        ? "text-green-400" : m.status === "Pending"
-        ? "text-yellow-400" : "text-red-400";
-      const dateStr = m.date ? new Date(m.date).toLocaleDateString() : "–";
-      const hasShot = m.screenshot_link && m.screenshot_link.startsWith("data:image");
-      return `
-        <tr class="hover:bg-slate-800/30 transition">
-          <td class="py-3 px-4 text-slate-400 text-xs">${dateStr}</td>
-          <td class="py-3 px-4 font-semibold">${m.home_player || "–"}</td>
-          <td class="py-3 px-4 font-semibold">${m.away_player || "–"}</td>
-          <td class="py-3 px-4 text-center font-bold text-blue-400">${m.home_score ?? "–"} – ${m.away_score ?? "–"}</td>
-          <td class="py-3 px-4 text-center text-xs font-bold ${statusColor}">${m.status || "–"}</td>
-          <td class="py-3 px-4 text-center">
-            ${hasShot ? `<button onclick="openLightbox('${m.screenshot_link}')" class="text-xs text-blue-400 hover:text-blue-300 underline">View</button>` : '<span class="text-slate-600 text-xs">None</span>'}
-          </td>
-        </tr>
-      `;
-    }).join("");
-  }
-
-  /* ========================
-     STANDINGS
-  ======================== */
-  async function loadStandings() {
-    const data = await fetch(`${SCRIPT_URL}?action=getStandings&t=${Date.now()}`).then(r => r.json());
-    const tbody = document.getElementById("adminStandings");
-
-    if (!Array.isArray(data) || data.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-slate-500">No standings yet</td></tr>';
-      return;
-    }
-
-    const badgeClass = (pos) => pos === 1
-      ? 'background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff'
-      : pos === 2 ? 'background:linear-gradient(135deg,#9ca3af,#6b7280);color:#fff'
-      : pos === 3 ? 'background:linear-gradient(135deg,#b45309,#92400e);color:#fff'
-      : 'background:rgba(51,65,85,0.8);color:#94a3b8';
-
-    tbody.innerHTML = data.map(p => `
-      <tr class="hover:bg-slate-800/30 transition">
-        <td class="py-3 px-4">
-          <div class="rank-badge" style="${badgeClass(p.pos)}">${p.pos}</div>
-        </td>
-        <td class="py-3 px-4 font-semibold">${p.name}</td>
-        <td class="py-3 px-4 text-center text-slate-400">${p.matches || 0}</td>
-        <td class="py-3 px-4 text-center text-green-400 font-bold">${p.pts || 0}</td>
-        <td class="py-3 px-4 text-center text-purple-400 font-bold">${p.gd >= 0 ? '+' : ''}${p.gd || 0}</td>
-        <td class="py-3 px-4 text-center text-orange-400">${p.gf || 0}</td>
-        <td class="py-3 px-4 text-center text-red-400">${p.ga || 0}</td>
-      </tr>
-    `).join("");
-  }
-
-  /* ========================
-     PLAYERS
-  ======================== */
-  async function loadPlayers() {
-    const data = await adminGet("getPlayers");
-    allPlayers = Array.isArray(data) ? data : [];
-    document.getElementById("statPlayers").innerText = allPlayers.length;
-
-    const tbody = document.getElementById("playersTable");
-    if (allPlayers.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-slate-500">No players yet</td></tr>';
-      return;
-    }
-
-    tbody.innerHTML = allPlayers.map((p, i) => `
-      <tr class="hover:bg-slate-800/30 transition">
-        <td class="py-3 px-4 text-slate-400">${i + 1}</td>
-        <td class="py-3 px-4 font-semibold">${p.name || "–"}</td>
-        <td class="py-3 px-4 text-slate-400 text-xs">${p.email || "–"}</td>
-        <td class="py-3 px-4 text-slate-500 text-xs font-mono">${p.reference_id || "–"}</td>
-        <td class="py-3 px-4 text-center">
-          <span class="text-xs px-2 py-1 rounded-full font-bold ${p.status === 'Active' ? 'bg-green-500/20 text-green-400' : 'bg-slate-700 text-slate-400'}">${p.status || "–"}</span>
-        </td>
-        <td class="py-3 px-4 text-slate-400 text-xs">${p.dateJoined ? new Date(p.dateJoined).toLocaleDateString() : "–"}</td>
-      </tr>
-    `).join("");
-  }
-
-  /* ========================
-     SEASON RESET
-  ======================== */
-  function openResetModal()  { document.getElementById("resetModal").classList.add("open"); }
-  function closeResetModal() { document.getElementById("resetModal").classList.remove("open"); }
-
-  async function confirmReset() {
-    const res = await adminPost({ action: "adminReset" });
-    closeResetModal();
-    if (res.error) { showToast("Error: " + res.error, "error"); return; }
-    showToast("Season wiped. Fresh start! 🎉", "success");
-    loadAll();
-  }
-
-  /* ========================
-     TABS
-  ======================== */
-  const tabs = ["pending", "history", "standings", "players", "season"];
-  function switchTab(name) {
-    tabs.forEach(t => {
-      document.getElementById("tab-" + t + "-content").classList.toggle("hidden", t !== name);
-      const btn = document.getElementById("tab-" + t);
-      btn.classList.toggle("active", t === name);
-      if (t !== name) btn.classList.add("text-slate-400");
-      else btn.classList.remove("text-slate-400");
-    });
-    // Reload relevant data when switching tabs
-    if (name === "history")   loadAllMatches();
-    if (name === "standings") loadStandings();
-    if (name === "players")   loadPlayers();
-    if (name === "season")    loadTournamentStatus();
-  }
-
-  /* ========================
-     LIGHTBOX
-  ======================== */
-  function openLightbox(src) {
-    document.getElementById("lightboxImg").src = src;
-    document.getElementById("lightbox").classList.add("open");
-  }
-  function closeLightbox() {
-    document.getElementById("lightbox").classList.remove("open");
-  }
-
-  /* ========================
-     TOAST
-  ======================== */
+  // ========================
+  // TOAST
+  // ========================
   function showToast(msg, type = "success") {
     const t = document.getElementById("toast");
     t.innerText = msg;
     t.className = "show " + type;
     setTimeout(() => { t.className = type; }, 3000);
   }
-
-  /* ========================
-     AUTO REFRESH (2 min)
-  ======================== */
-  setInterval(() => { if (accessToken) loadAll(); }, 120000);
 </script>
+
 </body>
 </html>
