@@ -238,6 +238,7 @@
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHtvLu74wApqPjqoNAp13cCTaFIhmnM5wzvOiwL0-Fwq3Jxm18xa5mWrLLeDJDFujF/exec";
 const PASS        = "*Goats@123";   // what admin types
+const ADMIN_TOKEN = "dls26admin9f3k"; // safe token for GET URLs
 let adminPass = null, pendingRow = null;
 
 /* ---- LOGIN ---- */
@@ -264,7 +265,7 @@ function doLogout() {
 
 /* ---- FETCH HELPERS ---- */
 async function apGet(action) {
-  const r = await fetch(`${SCRIPT_URL}?action=${action}&pass=${encodeURIComponent(adminPass)}&t=${Date.now()}`);
+  const r = await fetch(`${SCRIPT_URL}?action=${action}&pass=${ADMIN_TOKEN}&t=${Date.now()}`);
   return r.json();
 }
 async function apPost(payload) {
