@@ -6,24 +6,101 @@
   <title>Admin • DLS26 PRO</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { background: #0a0e27; color: #e2e8f0; font-family: 'Inter', sans-serif; }
+    * { font-family: 'Inter', sans-serif; }
+    body { background: #0a0e27; color: #e2e8f0; }
     .glass { background: rgba(15,23,42,0.85); backdrop-filter: blur(20px); border: 1px solid rgba(59,130,246,0.2); }
-    #adminPanel { display:none; }
-    #toast { position:fixed; bottom:24px; right:24px; z-index:9999; padding:12px 20px; border-radius:10px; font-size:13px; font-weight:600; transform:translateY(80px); opacity:0; transition:all 0.3s ease; }
+    .tab-btn { transition: all 0.2s; }
+    .tab-btn.active { background: rgba(59,130,246,0.2); border-color: rgba(59,130,246,0.6); color: #93c5fd; }
+    .card-pending { background: rgba(30,41,59,0.6); border: 1px solid rgba(59,130,246,0.15); border-radius: 14px; transition: border-color 0.2s; }
+    .card-pending:hover { border-color: rgba(59,130,246,0.4); }
+    .screenshot-thumb { width: 100%; max-height: 200px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(59,130,246,0.2); cursor: pointer; }
+    .rank-badge { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; }
+    .pulse-dot { width:8px;height:8px;border-radius:50%;background:#10b981;animation:pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
+
+    /* Lightbox */
+    #lightbox { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:9999; align-items:center; justify-content:center; }
+    #lightbox.open { display:flex; }
+    #lightbox img { max-width:90vw; max-height:90vh; border-radius:12px; }
+
+    /* Reject modal */
+    #rejectModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(6px); z-index:1000; align-items:center; justify-content:center; }
+    #rejectModal.open { display:flex; }
+
+    /* Reset confirm */
+    #resetModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(6px); z-index:1000; align-items:center; justify-content:center; }
+    #resetModal.open { display:flex; }
+
+    .spinner { animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Toast */
+    #toast { position:fixed; bottom:24px; right:24px; z-index:9998; padding:12px 20px; border-radius:10px; font-size:13px; font-weight:600; transform:translateY(80px); opacity:0; transition:all 0.3s ease; }
     #toast.show { transform:translateY(0); opacity:1; }
     #toast.success { background:rgba(16,185,129,0.2); border:1px solid rgba(16,185,129,0.4); color:#6ee7b7; }
     #toast.error { background:rgba(239,68,68,0.2); border:1px solid rgba(239,68,68,0.4); color:#fca5a5; }
+
+    /* Login Screen */
+    #loginScreen { min-height:100vh; display:flex; align-items:center; justify-content:center; }
+    #adminPanel { display:none; }
   </style>
 </head>
 <body>
 
+<!-- LIGHTBOX -->
+<div id="lightbox" onclick="closeLightbox()">
+  <img id="lightboxImg" src="" alt="Screenshot" />
+</div>
+
+<!-- REJECT MODAL -->
+<div id="rejectModal">
+  <div class="glass rounded-2xl p-8 max-w-md w-full mx-4">
+    <h3 class="text-lg font-black mb-2 text-red-400">❌ Reject Match</h3>
+    <p class="text-slate-400 text-sm mb-4">Give a reason so the player knows why their result was rejected.</p>
+    <select id="rejectReason" class="w-full bg-slate-900 border border-slate-700 text-white p-3 rounded-lg mb-3 text-sm">
+      <option value="Wrong score entered">Wrong score entered</option>
+      <option value="Screenshot does not match score">Screenshot does not match score</option>
+      <option value="Screenshot is unclear or missing">Screenshot is unclear or missing</option>
+      <option value="Duplicate submission">Duplicate submission</option>
+      <option value="Other">Other (type below)</option>
+    </select>
+    <input id="rejectCustom" placeholder="Custom reason (optional)..." class="w-full bg-slate-900 border border-slate-700 text-white p-3 rounded-lg mb-4 text-sm hidden" />
+    <div class="flex gap-3">
+      <button onclick="closeRejectModal()" class="flex-1 bg-slate-700/50 text-slate-300 py-3 rounded-lg font-semibold text-sm">Cancel</button>
+      <button onclick="confirmReject()" class="flex-1 bg-red-600/80 hover:bg-red-600 text-white py-3 rounded-lg font-semibold text-sm transition">Confirm Reject</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESET MODAL -->
+<div id="resetModal">
+  <div class="glass rounded-2xl p-8 max-w-md w-full mx-4 border border-red-500/30">
+    <div class="text-5xl mb-4 text-center">⚠️</div>
+    <h3 class="text-xl font-black mb-2 text-red-400 text-center">Wipe Entire Season?</h3>
+    <p class="text-slate-400 text-sm mb-2 text-center">This will permanently delete:</p>
+    <ul class="text-slate-300 text-sm mb-6 space-y-1 text-center">
+      <li>• All 20 registered players</li>
+      <li>• All match results</li>
+      <li>• All fixtures</li>
+      <li>• Tournament will reset to <span class="text-yellow-400">Waiting</span></li>
+    </ul>
+    <p class="text-red-400 text-xs text-center mb-6 font-semibold">This cannot be undone.</p>
+    <div class="flex gap-3">
+      <button onclick="closeResetModal()" class="flex-1 bg-slate-700/50 text-slate-300 py-3 rounded-lg font-semibold">Cancel</button>
+      <button onclick="confirmReset()" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-bold transition">Yes, Wipe Everything</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
 <!-- LOGIN SCREEN -->
-<div id="loginScreen" class="flex items-center justify-center min-h-screen">
-  <div class="glass rounded-2xl p-10 max-w-sm text-center">
+<div id="loginScreen">
+  <div class="text-center glass rounded-2xl p-10 max-w-sm mx-4">
     <div class="text-4xl mb-4">🔐</div>
     <h2 class="text-xl font-black mb-2">Admin Login</h2>
-    <input id="adminPassword" type="password" placeholder="Enter password" 
-           class="w-full bg-slate-900 border border-slate-700 text-white p-3 rounded-lg mb-4 text-sm"/>
+    <input id="adminPassword" type="password" placeholder="Enter password" class="w-full bg-slate-900 border border-slate-700 text-white p-3 rounded-lg mb-4 text-sm"/>
     <button onclick="checkPassword()" class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-lg font-bold text-white transition">Login</button>
     <p id="loginError" class="text-red-400 text-xs mt-2 hidden">Incorrect password</p>
   </div>
@@ -31,30 +108,13 @@
 
 <!-- MAIN ADMIN PANEL -->
 <div id="adminPanel">
-  <!-- your full admin panel here (header, tabs, tables) -->
-  <!-- same as your original code -->
+  <!-- Copy your entire original admin panel HTML from your first file here -->
+  <!-- Header, tabs, standings, players, season controls, etc. remain unchanged -->
 </div>
 
-<!-- TOAST -->
-<div id="toast"></div>
-
 <script>
-  const ADMIN_PASSWORD = "*Goats@123"; // <-- set your admin password here
-
-  function checkPassword() {
-    const entered = document.getElementById("adminPassword").value;
-    if (entered === ADMIN_PASSWORD) {
-      document.getElementById("loginScreen").style.display = "none";
-      document.getElementById("adminPanel").style.display = "block";
-      showToast("Login successful", "success");
-
-      // Load all your admin data
-      loadAll();
-    } else {
-      document.getElementById("loginError").classList.remove("hidden");
-      showToast("Incorrect password", "error");
-    }
-  }
+  const ADMIN_PASSWORD = "*Goats@123";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHtvLu74wApqPjqoNAp13cCTaFIhmnM5wzvOiwL0-Fwq3Jxm18xa5mWrLLeDJDFujF/exec";
 
   function showToast(msg, type="success") {
     const t = document.getElementById("toast");
@@ -63,9 +123,19 @@
     setTimeout(() => { t.className = type; }, 3000);
   }
 
-  // ========================
-  // YOUR EXISTING DATA FUNCTIONS (loadAll, loadPlayers, loadStandings, etc.)
-  // ========================
+  function checkPassword() {
+    const entered = document.getElementById("adminPassword").value;
+    if (entered === ADMIN_PASSWORD) {
+      document.getElementById("loginScreen").style.display = "none";
+      document.getElementById("adminPanel").style.display = "block";
+      showToast("Login successful", "success");
+      loadAll(); // load all your tournament data
+    } else {
+      document.getElementById("loginError").classList.remove("hidden");
+      showToast("Incorrect password", "error");
+    }
+  }
+
 </script>
 
 </body>
