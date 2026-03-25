@@ -178,6 +178,16 @@
                     </div>
                 </div>
 
+                <!-- Completed Fixtures -->
+                <div class="glass rounded-2xl p-6 card-hover">
+                    <h3 class="text-xl font-black mb-6 flex items-center gap-2">
+                        ✅ <span>Completed Matches</span>
+                    </h3>
+                    <div id="completedList" class="space-y-3">
+                        <p class="text-slate-500 text-center py-8">No completed matches yet</p>
+                    </div>
+                </div>
+
                 <!-- Last 5 Games -->
                 <div class="glass rounded-2xl p-6 card-hover">
                     <h3 class="text-xl font-black mb-6 flex items-center gap-2">
@@ -253,6 +263,7 @@
                 renderBanner(status);
                 renderStandings(standings);
                 renderFixtures(fixtures, status);
+                renderCompleted(games);
                 renderLastGames(games);
             } catch (err) {
                 console.error("Load error:", err);
@@ -391,6 +402,46 @@
         }
 
         /* =====================
+           COMPLETED MATCHES
+        ===================== */
+        function renderCompleted(games) {
+            const list = document.getElementById("completedList");
+            const approved = (games || []).filter(g => g.status === "Approved");
+            if (!approved.length) {
+                list.innerHTML = '<p class="text-slate-500 text-center py-8">No completed matches yet</p>';
+                return;
+            }
+            list.innerHTML = approved.map(g => {
+                const homePlayer = g.home_player || "";
+                const awayPlayer = g.away_player || "";
+                const homeScore  = g.home_score ?? 0;
+                const awayScore  = g.away_score ?? 0;
+                const dateVal    = g.date || "";
+                const isHome     = homePlayer === playerName;
+                const myScore    = isHome ? homeScore : awayScore;
+                const theirScore = isHome ? awayScore : homeScore;
+                const won  = myScore > theirScore;
+                const draw = myScore === theirScore;
+                const result      = won ? 'WIN' : draw ? 'DRAW' : 'LOSS';
+                const resultColor = won ? 'text-green-400' : draw ? 'text-yellow-400' : 'text-red-400';
+                const borderColor = won ? 'border-green-500' : draw ? 'border-yellow-500' : 'border-red-500/50';
+                return \`
+                    <div class="bg-slate-800/50 p-4 rounded-lg border-l-2 \${borderColor}">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="font-semibold text-sm">\${homePlayer} <span class="text-blue-400">\${homeScore}</span> – <span class="text-blue-400">\${awayScore}</span> \${awayPlayer}</span>
+                            <span class="text-xs font-black \${resultColor}">\${result}</span>
+                        </div>
+                        <div class="flex justify-between items-center mt-2">
+                            <p class="text-xs text-slate-500">\${dateVal ? new Date(dateVal).toLocaleDateString() : ""}</p>
+                            <span class="flex items-center gap-1 text-xs bg-green-500/15 text-green-400 border border-green-500/30 px-2 py-0.5 rounded-full font-semibold">
+                                ✔ Match Completed
+                            </span>
+                        </div>
+                    </div>\`;
+            }).join("");
+        }
+
+        /* =====================
            LAST 5 GAMES
         ===================== */
         function renderLastGames(games) {
@@ -429,14 +480,18 @@
                 }
 
                 const result      = won ? '✅ WIN' : draw ? '🤝 DRAW' : '❌ LOSS';
+                const resultColor = won ? 'text-green-400' : draw ? 'text-yellow-400' : 'text-red-400';
                 const borderColor = won ? 'border-green-500' : draw ? 'border-yellow-500' : 'border-red-500/50';
                 return `
                     <div class="bg-slate-800/50 p-4 rounded-lg hover:bg-slate-800 transition border-l-2 ${borderColor}">
                         <div class="flex justify-between items-center mb-2">
                             <span class="font-semibold text-sm">${homePlayer} <span class="text-blue-400">${homeScore}</span> – <span class="text-blue-400">${awayScore}</span> ${awayPlayer}</span>
-                            <span class="text-xs font-bold">${result}</span>
+                            <span class="text-xs font-black ${resultColor}">${result}</span>
                         </div>
-                        <p class="text-xs text-slate-500">${dateVal ? new Date(dateVal).toLocaleDateString() : ""}</p>
+                        <div class="flex justify-between items-center mt-1">
+                            <p class="text-xs text-slate-500">${dateVal ? new Date(dateVal).toLocaleDateString() : ""}</p>
+                            <span class="text-xs bg-green-500/15 text-green-400 border border-green-500/30 px-2 py-0.5 rounded-full font-semibold">✔ Admin Verified</span>
+                        </div>
                     </div>`;
             }).join("");
             list.innerHTML = html;
