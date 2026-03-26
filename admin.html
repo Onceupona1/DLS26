@@ -200,6 +200,17 @@
           <button onclick="setStatus('ended')"   class="px-5 py-2 rounded-xl text-sm font-bold bg-purple-500/15 text-purple-400 border border-purple-500/30 hover:bg-purple-500/25 transition cursor-pointer">Set → Ended</button>
         </div>
       </div>
+      <!-- Free Mode Toggle -->
+      <div class="glass rounded-2xl p-6 border border-green-500/20">
+        <h3 class="font-black text-lg mb-2 text-green-400">🆓 Free Mode</h3>
+        <p class="text-slate-400 text-sm mb-4">When ON — the register button accepts free players (team name + password only). No prize money shown. Use this when you want a free tournament.</p>
+        <div class="flex items-center gap-4">
+          <div id="freeModeStatus" class="text-xs px-3 py-1 rounded-full font-bold border bg-slate-700 text-slate-400 border-slate-600">Checking...</div>
+          <button onclick="toggleFreeMode(true)"  class="px-5 py-2 rounded-xl text-sm font-bold bg-green-500/15 text-green-400 border border-green-500/30 hover:bg-green-500/25 transition cursor-pointer">Enable Free Mode</button>
+          <button onclick="toggleFreeMode(false)" class="px-5 py-2 rounded-xl text-sm font-bold bg-slate-700/50 text-slate-300 border border-slate-600 hover:bg-slate-700 transition cursor-pointer">Disable Free Mode</button>
+        </div>
+      </div>
+
       <div class="glass rounded-2xl p-6 border border-yellow-500/20">
         <h3 class="font-black text-lg mb-4 text-yellow-400">🏆 Prize Money</h3>
         <div class="space-y-2 text-sm">
@@ -279,12 +290,30 @@ async function loadStatus() {
   pill.innerText = c.label;
   pill.className = "text-xs px-3 py-1 rounded-full font-bold border " + c.cls;
   if (info) info.innerHTML = "Status: <span class='text-white font-bold'>" + s.status + "</span> &nbsp;·&nbsp; Players: <span class='text-blue-400 font-bold'>" + s.playerCount + "/" + s.maxPlayers + "</span>";
+
+  const fmBadge = document.getElementById("freeModeStatus");
+  if (fmBadge) {
+    if (s.freeMode) {
+      fmBadge.innerText = "🆓 Free Mode ON";
+      fmBadge.className = "text-xs px-3 py-1 rounded-full font-bold border bg-green-500/20 text-green-400 border-green-500/30";
+    } else {
+      fmBadge.innerText = "💰 Paid Mode";
+      fmBadge.className = "text-xs px-3 py-1 rounded-full font-bold border bg-slate-700 text-slate-400 border-slate-600";
+    }
+  }
 }
 
 async function setStatus(ns) {
   const r = await apPost({ action: "adminSetStatus", newStatus: ns });
   if (r.error) { toast("Error: " + r.error, "err"); return; }
   toast("Status set to " + ns, "ok");
+  loadStatus();
+}
+
+async function toggleFreeMode(enable) {
+  const r = await apPost({ action: "adminSetFreeMode", enable: enable });
+  if (r.error) { toast("Error: " + r.error, "err"); return; }
+  toast(enable ? "🆓 Free mode ON" : "💰 Free mode OFF", "ok");
   loadStatus();
 }
 
