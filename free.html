@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free League • DLS26 PRO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .glass {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        .input-glass {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            transition: all 0.3s ease;
+        }
+        .input-glass:focus {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: #3b82f6;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+            outline: none;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+        }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+        .tab-btn {
+            flex: 1; padding: 10px 16px; border-radius: 10px;
+            font-weight: 700; font-size: 13px; cursor: pointer;
+            transition: all 0.2s; border: 1px solid transparent;
+            background: transparent; color: #64748b;
+        }
+        .tab-btn.active {
+            background: rgba(59,130,246,0.2);
+            border-color: rgba(59,130,246,0.5);
+            color: #93c5fd;
+        }
+        .free-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(59,130,246,0.15);
+            border: 1px solid rgba(59,130,246,0.4);
+            color: #93c5fd; font-size: 11px; font-weight: 700;
+            padding: 4px 12px; border-radius: 20px;
+            letter-spacing: 1px; text-transform: uppercase;
+        }
+        .err-box { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; padding: 12px 16px; border-radius: 10px; font-size: 13px; }
+        .suc-box { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; padding: 12px 16px; border-radius: 10px; font-size: 13px; }
+        .spinner { display: inline-block; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-[#0a0e27] text-slate-200 min-h-screen flex items-center justify-center px-4 py-10">
+
+    <!-- Background orbs -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute w-72 h-72 bg-blue-600 -top-32 -left-32 rounded-full blur-3xl opacity-20"></div>
+        <div class="absolute w-96 h-96 bg-purple-600 -bottom-32 -right-32 rounded-full blur-3xl opacity-20"></div>
+    </div>
+
+    <div class="w-full max-w-md relative z-10">
+
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <a href="index.html" class="text-slate-500 text-sm hover:text-slate-300 transition mb-4 inline-block">← Back to Home</a>
+            <div class="mb-3">
+                <span class="free-badge">🆓 Free Mode Active</span>
+            </div>
+            <h1 class="text-5xl font-black mb-2">DLS<span class="text-blue-500">26</span> PRO</h1>
+            <div class="h-1 w-16 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full mb-3"></div>
+            <p class="text-slate-400 text-sm">Free Tournament — No entry fee required</p>
+        </div>
+
+        <!-- Card -->
+        <div class="glass rounded-3xl p-8 shadow-2xl">
+
+            <!-- Tabs -->
+            <div class="flex gap-2 mb-8 p-1 rounded-xl bg-slate-900/50">
+                <button class="tab-btn active" id="tab-register" onclick="switchTab('register')">⚽ Join Free</button>
+                <button class="tab-btn" id="tab-login" onclick="switchTab('login')">🔓 Login</button>
+            </div>
+
+            <!-- REGISTER TAB -->
+            <div id="panel-register">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-black mb-1">Create Account</h2>
+                    <p class="text-slate-400 text-sm">Pick your team name and password to join the free league</p>
+                </div>
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Team Name</label>
+                        <input type="text" id="reg-team" placeholder="e.g. Real Accra FC" maxlength="30"
+                            class="w-full input-glass p-4 rounded-2xl text-white placeholder:text-slate-600"
+                            onkeydown="if(event.key==='Enter') document.getElementById('reg-pass').focus()"/>
+                        <p class="text-xs text-slate-500 mt-1">Max 30 characters · This is your public name</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Password</label>
+                        <input type="password" id="reg-pass" placeholder="Choose a password (min 4 chars)"
+                            class="w-full input-glass p-4 rounded-2xl text-white placeholder:text-slate-600"
+                            onkeydown="if(event.key==='Enter') handleRegister()"/>
+                    </div>
+                    <div id="reg-error" class="hidden err-box"></div>
+                    <div id="reg-success" class="hidden suc-box"></div>
+                    <button class="btn-primary w-full text-white font-bold py-4 rounded-2xl mt-2" id="reg-btn" onclick="handleRegister()">
+                        <span id="reg-btn-text">⚽ Join the Free League</span>
+                    </button>
+                </div>
+                <p class="text-center text-xs text-slate-500 mt-5">
+                    Already have an account?
+                    <button onclick="switchTab('login')" class="text-blue-400 hover:underline bg-transparent border-none cursor-pointer text-xs">Login here</button>
+                </p>
+            </div>
+
+            <!-- LOGIN TAB -->
+            <div id="panel-login" class="hidden">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-black mb-1">Welcome Back</h2>
+                    <p class="text-slate-400 text-sm">Login with your team name and password</p>
+                </div>
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Team Name</label>
+                        <input type="text" id="login-team" placeholder="Your team name"
+                            class="w-full input-glass p-4 rounded-2xl text-white placeholder:text-slate-600"
+                            onkeydown="if(event.key==='Enter') document.getElementById('login-pass').focus()"/>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Password</label>
+                        <input type="password" id="login-pass" placeholder="Your password"
+                            class="w-full input-glass p-4 rounded-2xl text-white placeholder:text-slate-600"
+                            onkeydown="if(event.key==='Enter') handleLogin()"/>
+                    </div>
+                    <div id="login-error" class="hidden err-box"></div>
+                    <button class="btn-primary w-full text-white font-bold py-4 rounded-2xl mt-2" id="login-btn" onclick="handleLogin()">
+                        <span id="login-btn-text">🔓 Login to Dashboard</span>
+                    </button>
+                </div>
+                <p class="text-center text-xs text-slate-500 mt-5">
+                    No account yet?
+                    <button onclick="switchTab('register')" class="text-blue-400 hover:underline bg-transparent border-none cursor-pointer text-xs">Register for free</button>
+                </p>
+            </div>
+
+        </div>
+
+        <!-- Info strip -->
+        <div class="glass rounded-2xl p-5 mt-4">
+            <div class="flex items-start gap-3">
+                <span class="text-xl">ℹ️</span>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    This is a <span class="text-blue-300 font-semibold">free tournament</span> — no entry fee, no prize money.
+                    Starts once <span class="text-white font-semibold">5 players</span> join.
+                    Each player plays <span class="text-white font-semibold">10 matches</span>.
+                    Registration open for <span class="text-white font-semibold">72 hours</span> after start.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHtvLu74wApqPjqoNAp13cCTaFIhmnM5wzvOiwL0-Fwq3Jxm18xa5mWrLLeDJDFujF/exec";
+
+        if (localStorage.getItem("isLoggedIn") === "true") {
+            window.location.href = "dashboard.html";
+        }
+
+        async function checkFreeMode() {
+            try {
+                const res    = await fetch(SCRIPT_URL + "?action=getTournamentStatus&t=" + Date.now());
+                const status = await res.json();
+                if (!status.freeMode) window.location.href = "login.html";
+            } catch(e) {}
+        }
+        checkFreeMode();
+
+        function switchTab(tab) {
+            document.getElementById("panel-register").classList.toggle("hidden", tab !== "register");
+            document.getElementById("panel-login").classList.toggle("hidden", tab !== "login");
+            document.getElementById("tab-register").classList.toggle("active", tab === "register");
+            document.getElementById("tab-login").classList.toggle("active", tab === "login");
+            setTimeout(() => document.getElementById(tab === "register" ? "reg-team" : "login-team").focus(), 50);
+        }
+
+        async function handleRegister() {
+            const team   = document.getElementById("reg-team").value.trim();
+            const pass   = document.getElementById("reg-pass").value.trim();
+            const errEl  = document.getElementById("reg-error");
+            const sucEl  = document.getElementById("reg-success");
+            const btn    = document.getElementById("reg-btn");
+            const btnTxt = document.getElementById("reg-btn-text");
+            errEl.classList.add("hidden");
+            sucEl.classList.add("hidden");
+
+            if (!team || team.length < 2) { showErr(errEl, "Team name must be at least 2 characters"); return; }
+            if (!pass || pass.length < 4) { showErr(errEl, "Password must be at least 4 characters"); return; }
+
+            btn.disabled = true;
+            btnTxt.innerHTML = '<span class="spinner">⟳</span> Creating account...';
+
+            try {
+                const res    = await fetch(SCRIPT_URL, {
+                    method: "POST",
+                    body:   JSON.stringify({ action: "freeRegister", teamName: team, password: pass })
+                });
+                const result = await res.json();
+                if (result.error) { showErr(errEl, result.error); return; }
+
+                sucEl.textContent = "✅ Account created! Taking you to the dashboard...";
+                sucEl.classList.remove("hidden");
+
+                setTimeout(() => {
+                    localStorage.setItem("isLoggedIn",   "true");
+                    localStorage.setItem("playerName",   result.teamName);
+                    localStorage.setItem("playerRef",    result.ref);
+                    localStorage.setItem("playerEmail",  "");
+                    localStorage.setItem("playerStatus", "Active");
+                    window.location.href = "dashboard.html";
+                }, 1200);
+            } catch(e) {
+                showErr(errEl, "Connection error. Please try again.");
+            } finally {
+                btn.disabled = false;
+                btnTxt.innerText = "⚽ Join the Free League";
+            }
+        }
+
+        async function handleLogin() {
+            const team   = document.getElementById("login-team").value.trim();
+            const pass   = document.getElementById("login-pass").value.trim();
+            const errEl  = document.getElementById("login-error");
+            const btn    = document.getElementById("login-btn");
+            const btnTxt = document.getElementById("login-btn-text");
+            errEl.classList.add("hidden");
+
+            if (!team || !pass) { showErr(errEl, "Please enter both team name and password"); return; }
+
+            btn.disabled = true;
+            btnTxt.innerHTML = '<span class="spinner">⟳</span> Logging in...';
+
+            try {
+                const res    = await fetch(SCRIPT_URL, {
+                    method: "POST",
+                    body:   JSON.stringify({ action: "freeLogin", teamName: team, password: pass })
+                });
+                const result = await res.json();
+                if (result.error) {
+                    showErr(errEl, result.error);
+                    if (result.error.includes("Invalid")) {
+                        errEl.innerHTML += '<br><button onclick="switchTab(\'register\')" style="color:#60a5fa;background:none;border:none;cursor:pointer;font-size:12px;text-decoration:underline;margin-top:4px;">Register a free account?</button>';
+                    }
+                    return;
+                }
+                localStorage.setItem("isLoggedIn",   "true");
+                localStorage.setItem("playerName",   result.name);
+                localStorage.setItem("playerRef",    result.ref);
+                localStorage.setItem("playerEmail",  "");
+                localStorage.setItem("playerStatus", "Active");
+                window.location.href = "dashboard.html";
+            } catch(e) {
+                showErr(errEl, "Connection error. Please try again.");
+            } finally {
+                btn.disabled = false;
+                btnTxt.innerText = "🔓 Login to Dashboard";
+            }
+        }
+
+        function showErr(el, msg) {
+            el.textContent = "❌ " + msg;
+            el.classList.remove("hidden");
+        }
+
+        document.getElementById("reg-team").focus();
+    </script>
+</body>
+</html>
