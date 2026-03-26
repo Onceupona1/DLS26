@@ -240,30 +240,6 @@
             </div>
         </div>
 
-        <!-- Live Standings Table -->
-        <div class="glass rounded-2xl overflow-hidden" id="standingsSection">
-            <div class="p-6 border-b border-slate-700/50 flex items-center justify-between">
-                <h3 class="text-xl font-black flex items-center gap-2">📊 Live Standings</h3>
-                <div id="standingsStatus" class="text-xs px-3 py-1 rounded-full font-bold border bg-yellow-500/20 text-yellow-400 border-yellow-500/30">Loading...</div>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead class="border-b border-slate-700">
-                        <tr class="text-slate-400 text-xs uppercase">
-                            <th class="text-left py-3 px-4">#</th>
-                            <th class="text-left py-3 px-4">Team</th>
-                            <th class="text-center py-3 px-4">MP</th>
-                            <th class="text-center py-3 px-4">PTS</th>
-                            <th class="text-center py-3 px-4">GD</th>
-                            <th class="text-center py-3 px-4">GF</th>
-                        </tr>
-                    </thead>
-                    <tbody id="homeStandingsTable">
-                        <tr><td colspan="6" class="text-center py-8 text-slate-500">Loading standings...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
     </div>
 
     <!-- CTA Section -->
@@ -276,88 +252,18 @@
     </div>
 
     <!-- Prize Money Section -->
-    <div class="relative max-w-3xl mx-auto px-4 py-20">
+    <div class="relative max-w-3xl mx-auto px-4 py-20" id="prizeSection">
         <div class="text-center mb-12">
             <h2 class="text-4xl font-black mb-3">💰 Prize Money</h2>
-            <p class="text-slate-400">Top 5 finishers take home real cash. Compete hard, win big.</p>
+            <p class="text-slate-400">Top 5 finishers take home real cash. Updates live as more players join.</p>
+            <p class="text-sm text-slate-500 mt-2">₵15 entry · Admin takes 10% · Remaining split between top 5</p>
         </div>
-        <div class="space-y-4">
-            <!-- 1st -->
-            <div class="prize-card prize-1 p-5 flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-full bg-yellow-500/20 border border-yellow-500/40 flex items-center justify-center text-2xl font-black text-yellow-400">1</div>
-                    <div>
-                        <p class="font-black text-lg text-yellow-400">🥇 Champion</p>
-                        <p class="text-slate-400 text-sm">League Winner</p>
-                    </div>
-                </div>
-                <div class="text-right">
-                    <p class="text-3xl font-black text-yellow-400">₵100</p>
-                    <p class="text-xs text-slate-500">Prize Money</p>
-                </div>
-            </div>
-            <!-- 2nd -->
-            <div class="prize-card prize-2 p-5 flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-full bg-slate-400/20 border border-slate-400/40 flex items-center justify-center text-2xl font-black text-slate-300">2</div>
-                    <div>
-                        <p class="font-black text-lg text-slate-300">🥈 Runner-Up</p>
-                        <p class="text-slate-400 text-sm">2nd Place</p>
-                    </div>
-                </div>
-                <div class="text-right">
-                    <p class="text-3xl font-black text-slate-300">₵65</p>
-                    <p class="text-xs text-slate-500">Prize Money</p>
-                </div>
-            </div>
-            <!-- 3rd -->
-            <div class="prize-card prize-3 p-5 flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-full bg-amber-800/20 border border-amber-700/40 flex items-center justify-center text-2xl font-black text-amber-600">3</div>
-                    <div>
-                        <p class="font-black text-lg text-amber-600">🥉 Third Place</p>
-                        <p class="text-slate-400 text-sm">3rd Place</p>
-                    </div>
-                </div>
-                <div class="text-right">
-                    <p class="text-3xl font-black text-amber-600">₵40</p>
-                    <p class="text-xs text-slate-500">Prize Money</p>
-                </div>
-            </div>
-            <!-- 4th -->
-            <div class="prize-card prize-other p-5 flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-2xl font-black text-blue-400">4</div>
-                    <div>
-                        <p class="font-black text-lg text-slate-300">4th Place</p>
-                        <p class="text-slate-400 text-sm">Top 5 Finish</p>
-                    </div>
-                </div>
-                <div class="text-right">
-                    <p class="text-3xl font-black text-blue-400">₵25</p>
-                    <p class="text-xs text-slate-500">Prize Money</p>
-                </div>
-            </div>
-            <!-- 5th -->
-            <div class="prize-card prize-other p-5 flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-2xl font-black text-blue-400">5</div>
-                    <div>
-                        <p class="font-black text-lg text-slate-300">5th Place</p>
-                        <p class="text-slate-400 text-sm">Top 5 Finish</p>
-                    </div>
-                </div>
-                <div class="text-right">
-                    <p class="text-3xl font-black text-blue-400">₵25</p>
-                    <p class="text-xs text-slate-500">Prize Money</p>
-                </div>
-            </div>
+        <div class="space-y-4" id="prizeCards">
+            <div class="glass rounded-2xl p-8 text-center text-slate-500">Loading prize pool...</div>
         </div>
-
-        <!-- Total pot -->
         <div class="mt-6 glass rounded-2xl p-5 flex items-center justify-between border border-blue-500/20">
             <p class="text-slate-400 font-semibold">Total Prize Pool</p>
-            <p class="text-2xl font-black text-blue-400">₵255 <span class="text-sm font-normal text-slate-500">Cedis</span></p>
+            <p class="text-2xl font-black text-blue-400" id="totalPot">₵– <span class="text-sm font-normal text-slate-500">Cedis</span></p>
         </div>
 
         <!-- WhatsApp join banner -->
@@ -445,6 +351,17 @@
             // Nav pill
             navCount.classList.remove("hidden");
 
+            // Render dynamic prize pool
+            renderPrizePool(status);
+
+            // Show/hide prize section based on free mode
+            const prizeSection = document.getElementById("prizeSection");
+            if (status.freeMode) {
+                prizeSection.style.display = "none";
+            } else {
+                prizeSection.style.display = "";
+            }
+
             if (status.status === "waiting") {
                 const remaining = status.maxPlayers - status.playerCount;
                 const pct = (status.playerCount / status.maxPlayers) * 100;
@@ -512,46 +429,40 @@
             if (e.target === this) closeModal();
         });
 
+        function renderPrizePool(status) {
+            if (status.freeMode) return;
+            const cards  = document.getElementById("prizeCards");
+            const totEl  = document.getElementById("totalPot");
+            const prizes = status.prizes || {};
+            const pool   = status.prizePool || 0;
+
+            if (totEl) totEl.innerHTML = "₵" + pool + " <span class='text-sm font-normal text-slate-500'>Cedis</span>";
+
+            const rows = [
+                { pos:1, label:"🥇 Champion",   color:"text-yellow-400", border:"border-yellow-500/40", amount: prizes.first  || 0 },
+                { pos:2, label:"🥈 Runner-Up",  color:"text-slate-300",  border:"border-slate-400/40",  amount: prizes.second || 0 },
+                { pos:3, label:"🥉 Third Place", color:"text-amber-600",  border:"border-amber-700/40",  amount: prizes.third  || 0 },
+                { pos:4, label:"4th Place",      color:"text-blue-400",   border:"border-blue-500/20",   amount: prizes.fourth || 0 },
+                { pos:5, label:"5th Place",      color:"text-blue-400",   border:"border-blue-500/20",   amount: prizes.fifth  || 0 }
+            ];
+
+            if (cards) cards.innerHTML = rows.map(r => `
+                <div class="prize-card p-5 flex items-center justify-between" style="background:rgba(15,23,42,0.7);border-radius:1rem;border:1px solid rgba(59,130,246,0.15);">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center text-2xl font-black ${r.color}" style="background:rgba(59,130,246,0.1);border:1px solid;border-color:inherit;">${r.pos}</div>
+                        <p class="font-black text-lg ${r.color}">${r.label}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-3xl font-black ${r.color}">₵${r.amount}</p>
+                        <p class="text-xs text-slate-500">Prize Money</p>
+                    </div>
+                </div>`).join("");
+        }
+
         // Load on mount
         loadStatus();
-        loadHomeStandings();
 
-        async function loadHomeStandings() {
-            try {
-                const res  = await fetch(SCRIPT_URL + "?action=getStandings&t=" + Date.now());
-                const data = await res.json();
-                const tbody = document.getElementById("homeStandingsTable");
-                const badge = document.getElementById("standingsStatus");
 
-                if (!Array.isArray(data) || !data.length) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-slate-500">No standings yet — tournament hasn't started</td></tr>';
-                    badge.innerText = "⏳ Waiting";
-                    return;
-                }
-
-                badge.innerText = "🟢 Live";
-                badge.className = "text-xs px-3 py-1 rounded-full font-bold border bg-green-500/20 text-green-400 border-green-500/30";
-
-                const badgeClass = pos => pos === 1 ? 'background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff'
-                    : pos === 2 ? 'background:linear-gradient(135deg,#9ca3af,#6b7280);color:#fff'
-                    : pos === 3 ? 'background:linear-gradient(135deg,#b45309,#92400e);color:#fff'
-                    : 'background:rgba(51,65,85,0.8);color:#94a3b8';
-
-                tbody.innerHTML = data.map(p => `
-                    <tr class="hover:bg-slate-800/30 transition border-b border-slate-700/30">
-                        <td class="py-3 px-4">
-                            <div style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;${badgeClass(p.pos)}">${p.pos}</div>
-                        </td>
-                        <td class="py-3 px-4 font-semibold">${p.name}</td>
-                        <td class="py-3 px-4 text-center text-slate-400">${p.matches || 0}</td>
-                        <td class="py-3 px-4 text-center text-green-400 font-bold">${p.pts || 0}</td>
-                        <td class="py-3 px-4 text-center text-purple-400 font-bold">${(p.gd >= 0 ? '+' : '') + p.gd}</td>
-                        <td class="py-3 px-4 text-center text-orange-400">${p.gf || 0}</td>
-                    </tr>`).join("");
-            } catch(e) {
-                console.error("Standings error:", e);
-            }
-        }
     </script>
 </body>
 </html>
