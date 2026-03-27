@@ -23,6 +23,19 @@
     #toast.show{opacity:1;transform:translateY(0);}
     #toast.ok{background:rgba(16,185,129,.2);border:1px solid rgba(16,185,129,.4);color:#6ee7b7;}
     #toast.err{background:rgba(239,68,68,.2);border:1px solid rgba(239,68,68,.4);color:#fca5a5;}
+
+    /* Skeleton loader */
+    .skeleton{background:linear-gradient(90deg,rgba(30,41,59,.8) 25%,rgba(51,65,85,.6) 50%,rgba(30,41,59,.8) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px;}
+    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    .sk-row{height:44px;margin-bottom:8px;}
+    .sk-card{height:90px;margin-bottom:12px;}
+    .sk-stat{height:64px;border-radius:12px;}
+
+    /* Slide panel */
+    #playerPanel{position:fixed;top:0;right:-520px;width:500px;height:100vh;background:rgba(10,15,35,0.98);border-left:1px solid rgba(59,130,246,0.3);z-index:999;overflow-y:auto;transition:right 0.35s cubic-bezier(.4,0,.2,1);backdrop-filter:blur(20px);}
+    #playerPanel.open{right:0;}
+    #panelOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:998;}
+    #panelOverlay.open{display:block;}
     .match-card{background:rgba(30,41,59,.6);border:1px solid rgba(59,130,246,.15);border-radius:14px;transition:border-color .2s;}
     .match-card:hover{border-color:rgba(59,130,246,.35);}
     .ss-thumb{width:100%;max-height:220px;object-fit:cover;border-radius:8px;cursor:zoom-in;border:1px solid rgba(59,130,246,.2);}
@@ -42,6 +55,52 @@
   </style>
 </head>
 <body>
+
+<!-- Panel Overlay -->
+<div id="panelOverlay" onclick="closePanel()"></div>
+
+<!-- Player Dashboard Panel -->
+<div id="playerPanel">
+  <div style="padding:24px;">
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h2 class="text-lg font-black" id="panelPlayerName">Player</h2>
+        <p class="text-xs text-slate-400" id="panelPlayerType"></p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="resetPassBtn" onclick="openResetPassModal()" class="hidden text-xs bg-yellow-500/15 text-yellow-400 border border-yellow-500/30 px-3 py-1 rounded-lg font-semibold hover:bg-yellow-500/25 transition cursor-pointer">🔑 Reset Password</button>
+        <button onclick="closePanel()" class="text-slate-400 hover:text-white transition text-2xl leading-none cursor-pointer">✕</button>
+      </div>
+    </div>
+
+    <!-- Player Stats -->
+    <div class="grid grid-cols-4 gap-2 mb-6" id="panelStats">
+      <div class="sk-stat skeleton"></div>
+      <div class="sk-stat skeleton"></div>
+      <div class="sk-stat skeleton"></div>
+      <div class="sk-stat skeleton"></div>
+    </div>
+
+    <!-- Upcoming Fixtures -->
+    <div class="mb-6">
+      <h3 class="text-sm font-black text-slate-300 mb-3 uppercase tracking-wider">📅 Upcoming Fixtures</h3>
+      <div id="panelFixtures">
+        <div class="sk-card skeleton"></div>
+        <div class="sk-card skeleton"></div>
+        <div class="sk-card skeleton"></div>
+      </div>
+    </div>
+
+    <!-- Completed Matches -->
+    <div>
+      <h3 class="text-sm font-black text-slate-300 mb-3 uppercase tracking-wider">✅ Completed Matches</h3>
+      <div id="panelMatches">
+        <div class="sk-card skeleton"></div>
+        <div class="sk-card skeleton"></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div id="lightbox" onclick="closeLightbox()"><img id="lightboxImg" src="" alt=""/></div>
 <div id="toast"></div>
@@ -63,6 +122,21 @@
     <div class="flex gap-3 mt-4">
       <button onclick="closeRejectModal()" class="flex-1 bg-slate-700/50 text-slate-300 py-3 rounded-xl font-semibold text-sm cursor-pointer hover:bg-slate-700 transition">Cancel</button>
       <button onclick="confirmReject()" class="flex-1 btn-r py-3 rounded-xl text-sm">Confirm Reject</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESET PASSWORD MODAL -->
+<div id="resetPassModal" class="modal-bg">
+  <div class="glass rounded-2xl p-8 max-w-md w-full mx-4">
+    <h3 class="text-lg font-black mb-1 text-yellow-400">🔑 Reset Password</h3>
+    <p class="text-slate-400 text-sm mb-2">Set a new temporary password for <span id="resetPassName" class="text-white font-bold"></span>.</p>
+    <p class="text-slate-500 text-xs mb-5">Tell them to log in with this password and remember it.</p>
+    <label class="text-xs text-slate-400 uppercase tracking-wider block mb-2">New Password</label>
+    <input type="text" id="newPassInput" placeholder="Enter new password (min 4 chars)" class="w-full bg-slate-900 border border-slate-700 text-white p-3 rounded-lg mb-4 text-sm" style="outline:none;"/>
+    <div class="flex gap-3">
+      <button onclick="closeResetPassModal()" class="flex-1 bg-slate-700/50 text-slate-300 py-3 rounded-xl font-semibold text-sm cursor-pointer hover:bg-slate-700 transition">Cancel</button>
+      <button onclick="confirmResetPass()" class="flex-1 bg-yellow-600/80 hover:bg-yellow-600 text-white py-3 rounded-xl font-bold text-sm transition cursor-pointer">Set Password</button>
     </div>
   </div>
 </div>
@@ -112,10 +186,10 @@
 
   <main class="max-w-7xl mx-auto px-4 py-8">
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-      <div class="glass rounded-2xl p-5"><div class="text-2xl font-black text-yellow-400 mb-1" id="sc-pending">–</div><p class="text-xs text-slate-400 uppercase tracking-wider">Pending</p></div>
-      <div class="glass rounded-2xl p-5"><div class="text-2xl font-black text-green-400 mb-1" id="sc-approved">–</div><p class="text-xs text-slate-400 uppercase tracking-wider">Approved</p></div>
-      <div class="glass rounded-2xl p-5"><div class="text-2xl font-black text-blue-400 mb-1" id="sc-players">–</div><p class="text-xs text-slate-400 uppercase tracking-wider">Players</p></div>
-      <div class="glass rounded-2xl p-5"><div class="text-2xl font-black text-red-400 mb-1" id="sc-rejected">–</div><p class="text-xs text-slate-400 uppercase tracking-wider">Rejected</p></div>
+      <div class="glass rounded-2xl p-5"><div class="text-2xl font-black text-yellow-400 mb-1" id="sc-pending"><div class="skeleton sk-stat" style="width:40px;height:28px;"></div></div><p class="text-xs text-slate-400 uppercase tracking-wider">Pending</p></div>
+      <div class="glass rounded-2xl p-5"><div class="text-2xl font-black text-green-400 mb-1" id="sc-approved"><div class="skeleton sk-stat" style="width:40px;height:28px;"></div></div><p class="text-xs text-slate-400 uppercase tracking-wider">Approved</p></div>
+      <div class="glass rounded-2xl p-5"><div class="text-2xl font-black text-blue-400 mb-1" id="sc-players"><div class="skeleton sk-stat" style="width:40px;height:28px;"></div></div><p class="text-xs text-slate-400 uppercase tracking-wider">Players</p></div>
+      <div class="glass rounded-2xl p-5"><div class="text-2xl font-black text-red-400 mb-1" id="sc-rejected"><div class="skeleton sk-stat" style="width:40px;height:28px;"></div></div><p class="text-xs text-slate-400 uppercase tracking-wider">Rejected</p></div>
     </div>
 
     <div class="flex flex-wrap gap-2 mb-6">
@@ -132,7 +206,7 @@
         <p class="text-lg font-bold text-green-400">All clear!</p>
         <p class="text-slate-400 text-sm mt-1">No pending results.</p>
       </div>
-      <div id="pendingList" class="space-y-5"></div>
+      <div id="pendingList" class="space-y-5"><div class="sk-card skeleton"></div><div class="sk-card skeleton"></div><div class="sk-card skeleton"></div></div>
     </div>
 
     <div id="c-history" class="hidden">
@@ -148,7 +222,7 @@
               <th class="text-center py-3 px-4">Screenshot</th>
             </tr>
           </thead>
-          <tbody id="historyBody"><tr><td colspan="6" class="text-center py-10 text-slate-500">Loading…</td></tr></tbody>
+          <tbody id="historyBody"><tr><td colspan="6" class="py-2"><div class="skeleton sk-row"></div><div class="skeleton sk-row"></div><div class="skeleton sk-row"></div></td></tr></tbody>
         </table>
       </div>
     </div>
@@ -167,7 +241,7 @@
               <th class="text-center py-3 px-4">GA</th>
             </tr>
           </thead>
-          <tbody id="standingsBody"><tr><td colspan="7" class="text-center py-10 text-slate-500">Loading…</td></tr></tbody>
+          <tbody id="standingsBody"><tr><td colspan="7" class="py-2"><div class="skeleton sk-row"></div><div class="skeleton sk-row"></div><div class="skeleton sk-row"></div></td></tr></tbody>
         </table>
       </div>
     </div>
@@ -182,10 +256,10 @@
               <th class="text-left py-3 px-4">Email</th>
               <th class="text-left py-3 px-4">Reference</th>
               <th class="text-center py-3 px-4">Status</th>
-              <th class="text-left py-3 px-4">Joined</th>
+              <th class="text-center py-3 px-4">View</th>
             </tr>
           </thead>
-          <tbody id="playersBody"><tr><td colspan="6" class="text-center py-10 text-slate-500">Loading…</td></tr></tbody>
+          <tbody id="playersBody"><tr><td colspan="6" class="py-2"><div class="skeleton sk-row"></div><div class="skeleton sk-row"></div><div class="skeleton sk-row"></div></td></tr></tbody>
         </table>
       </div>
     </div>
@@ -198,6 +272,16 @@
           <button onclick="setStatus('waiting')" class="px-5 py-2 rounded-xl text-sm font-bold bg-yellow-500/15 text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/25 transition cursor-pointer">Set → Waiting</button>
           <button onclick="setStatus('live')"    class="px-5 py-2 rounded-xl text-sm font-bold bg-green-500/15 text-green-400 border border-green-500/30 hover:bg-green-500/25 transition cursor-pointer">Set → Live</button>
           <button onclick="setStatus('ended')"   class="px-5 py-2 rounded-xl text-sm font-bold bg-purple-500/15 text-purple-400 border border-purple-500/30 hover:bg-purple-500/25 transition cursor-pointer">Set → Ended</button>
+        </div>
+      </div>
+
+      <!-- Force Open Registration -->
+      <div class="glass rounded-2xl p-6 border border-blue-500/20">
+        <h3 class="font-black text-lg mb-2 text-blue-400">🔓 Force Open Registration</h3>
+        <p class="text-slate-400 text-sm mb-4">Opens registration for exactly <strong class="text-white">24 hours</strong> regardless of player count or tournament status. Use this to allow late players to join at any time.</p>
+        <div class="flex items-center gap-4 flex-wrap">
+          <button onclick="forceOpenReg()" class="px-6 py-3 rounded-xl font-bold text-sm bg-blue-500/15 text-blue-400 border border-blue-500/30 hover:bg-blue-500/25 transition cursor-pointer">🔓 Open Registration for 24hrs</button>
+          <div id="regClosesDisplay" class="text-xs text-slate-500"></div>
         </div>
       </div>
       <!-- Free Mode Toggle -->
@@ -289,7 +373,15 @@ async function loadStatus() {
   const c = cfg[s.status] || cfg.waiting;
   pill.innerText = c.label;
   pill.className = "text-xs px-3 py-1 rounded-full font-bold border " + c.cls;
-  if (info) info.innerHTML = "Status: <span class='text-white font-bold'>" + s.status + "</span> &nbsp;·&nbsp; Players: <span class='text-blue-400 font-bold'>" + s.playerCount + "/" + s.maxPlayers + "</span>";
+  var regInfo = "";
+  if (s.registrationCloses) {
+    var rc = new Date(s.registrationCloses);
+    var open = new Date() < rc;
+    regInfo = " &nbsp;·&nbsp; Reg " + (open ? "<span class='text-green-400'>open until " + rc.toLocaleString() + "</span>" : "<span class='text-red-400'>closed</span>");
+  }
+  if (info) info.innerHTML = "Status: <span class='text-white font-bold'>" + s.status + "</span> &nbsp;·&nbsp; Players: <span class='text-blue-400 font-bold'>" + s.playerCount + "/" + s.maxPlayers + "</span>" + regInfo;
+  var rcd = document.getElementById("regClosesDisplay");
+  if (rcd && s.registrationCloses) { rcd.innerText = "Currently closes: " + new Date(s.registrationCloses).toLocaleString(); }
 
   const fmBadge = document.getElementById("freeModeStatus");
   if (fmBadge) {
@@ -437,13 +529,18 @@ async function loadPlayers() {
   const tbody = document.getElementById("playersBody");
   if (!all.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-slate-500">No players yet</td></tr>'; return; }
   tbody.innerHTML = all.map(function(p, i) {
+    var typeBadge = p.type === "free"
+      ? "<span class='text-xs px-2 py-1 rounded-full font-bold bg-blue-500/20 text-blue-400'>Free</span>"
+      : "<span class='text-xs px-2 py-1 rounded-full font-bold bg-yellow-500/20 text-yellow-400'>Paid</span>";
     return '<tr class="hover:bg-slate-800/30 transition">' +
       '<td class="py-3 px-4 text-slate-400">' + (i + 1) + '</td>' +
-      '<td class="py-3 px-4 font-semibold">' + esc(p.name || "–") + '</td>' +
+      '<td class="py-3 px-4 font-semibold">' + esc(p.name || "–") + ' ' + typeBadge + '</td>' +
       '<td class="py-3 px-4 text-slate-400 text-xs">' + esc(p.email || "–") + '</td>' +
       '<td class="py-3 px-4 text-slate-500 text-xs font-mono">' + (p.reference_id || "–") + '</td>' +
       '<td class="py-3 px-4 text-center"><span class="text-xs px-2 py-1 rounded-full font-bold ' + (p.status === "Active" ? "bg-green-500/20 text-green-400" : "bg-slate-700 text-slate-400") + '">' + (p.status || "–") + '</span></td>' +
-      '<td class="py-3 px-4 text-slate-400 text-xs">' + (p.dateJoined ? new Date(p.dateJoined).toLocaleDateString() : "–") + '</td>' +
+      '<td class="py-3 px-4 text-center">' +
+        '<button onclick="viewPlayerPanel(' + JSON.stringify(p.name) + ', ' + JSON.stringify(p.type || "paid") + ')" class="text-xs text-blue-400 hover:text-blue-300 underline cursor-pointer bg-transparent border-none">View Dashboard</button>' +
+      '</td>' +
     '</tr>';
   }).join("");
 }
@@ -488,6 +585,120 @@ function toast(msg, type) {
 /* ---- ESCAPE ---- */
 function esc(s) {
   return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+/* ---- FORCE OPEN REGISTRATION ---- */
+async function forceOpenReg() {
+  const r = await apPost({ action: "adminForceOpenReg" });
+  if (r.error) { toast("Error: " + r.error, "err"); return; }
+  const closes = new Date(r.closes);
+  toast("🔓 Registration open until " + closes.toLocaleString(), "ok");
+  loadStatus();
+}
+
+/* ---- PLAYER DASHBOARD PANEL ---- */
+async function viewPlayerPanel(playerName, playerType) {
+  currentPanelPlayer = playerName;
+  currentPanelType   = playerType;
+  document.getElementById("panelPlayerName").innerText = playerName;
+  document.getElementById("panelPlayerType").innerText = playerType === "free" ? "🆓 Free Player" : "💰 Paid Player";
+  // Only show reset password for free players
+  var resetBtn = document.getElementById("resetPassBtn");
+  if (resetBtn) resetBtn.classList.toggle("hidden", playerType !== "free");
+  document.getElementById("panelStats").innerHTML = '<div class="sk-stat skeleton"></div><div class="sk-stat skeleton"></div><div class="sk-stat skeleton"></div><div class="sk-stat skeleton"></div>';
+  document.getElementById("panelFixtures").innerHTML = '<div class="sk-card skeleton"></div><div class="sk-card skeleton"></div><div class="sk-card skeleton"></div>';
+  document.getElementById("panelMatches").innerHTML = '<div class="sk-card skeleton"></div><div class="sk-card skeleton"></div>';
+  document.getElementById("playerPanel").classList.add("open");
+  document.getElementById("panelOverlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+  try {
+    var url = SCRIPT_URL + "?action=getPlayerDashboard&player=" + encodeURIComponent(playerName) + "&pass=" + encodeURIComponent(PASS) + "&t=" + Date.now();
+    var res  = await fetch(url);
+    var data = await res.json();
+    if (data.error) { toast("Error: " + data.error, "err"); return; }
+    renderPanelStats(data.standings);
+    renderPanelFixtures(data.fixtures, playerName);
+    renderPanelMatches(data.matches, playerName);
+  } catch(e) { toast("Failed to load player data", "err"); }
+}
+
+var currentPanelPlayer = null;
+var currentPanelType   = null;
+
+function closePanel() {
+  document.getElementById("playerPanel").classList.remove("open");
+  document.getElementById("panelOverlay").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+function renderPanelStats(s) {
+  var el = document.getElementById("panelStats");
+  if (!s) { el.innerHTML = '<div style="grid-column:span 4;text-align:center;color:#64748b;font-size:13px;padding:8px;">No standings data yet</div>'; return; }
+  el.innerHTML = statBox(s.pos||"–","Rank","#60a5fa") + statBox(s.pts||0,"Points","#4ade80") + statBox((s.gd>=0?"+":"")+(s.gd||0),"GD","#c084fc") + statBox(s.matches||0,"Played","#fb923c");
+}
+
+function statBox(val,label,color) {
+  return '<div style="background:rgba(30,41,59,.6);border:1px solid rgba(59,130,246,.15);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:20px;font-weight:900;color:'+color+';">'+val+'</div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-top:3px;">'+label+'</div></div>';
+}
+
+function renderPanelFixtures(fixtures, playerName) {
+  var el = document.getElementById("panelFixtures");
+  if (!fixtures || !fixtures.length) { el.innerHTML = '<p style="color:#64748b;font-size:13px;padding:8px;">No upcoming fixtures</p>'; return; }
+  el.innerHTML = fixtures.map(function(f) {
+    var dt = f.date ? new Date(f.date) : null;
+    var dateStr = dt ? dt.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}) : "TBD";
+    var timeStr = dt ? dt.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit",hour12:true}) : "";
+    var code = f.game_code || "";
+    var isHome = f.home_player === playerName;
+    return '<div style="background:rgba(30,41,59,.5);border-left:2px solid rgba(59,130,246,.5);border-radius:8px;padding:10px 12px;margin-bottom:8px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+        '<div><p style="font-size:13px;font-weight:600;">'+esc(f.home_player)+' <span style="color:#94a3b8;font-size:11px;">vs</span> '+esc(f.away_player)+'</p>' +
+        '<p style="font-size:11px;color:#64748b;margin-top:2px;">'+(isHome?"Home":"Away")+' · '+timeStr+' · '+dateStr+'</p></div>' +
+        (code?'<span style="font-family:monospace;font-size:11px;font-weight:900;color:#93c5fd;background:rgba(59,130,246,.1);border:1px dashed rgba(59,130,246,.3);padding:3px 8px;border-radius:5px;">'+code+'</span>':'') +
+      '</div></div>';
+  }).join("");
+}
+
+function renderPanelMatches(matches, playerName) {
+  var el = document.getElementById("panelMatches");
+  if (!matches || !matches.length) { el.innerHTML = '<p style="color:#64748b;font-size:13px;padding:8px;">No completed matches yet</p>'; return; }
+  el.innerHTML = matches.map(function(g) {
+    var hp=g.home_player||"",ap=g.away_player||"",hs=g.home_score||0,as_=g.away_score||0;
+    var home=hp===playerName,my=home?hs:as_,their=home?as_:hs;
+    var won=my>their,draw=my===their;
+    var res=won?"✅ WIN":draw?"🤝 DRAW":"❌ LOSS";
+    var bc=won?"#22c55e":draw?"#eab308":"rgba(239,68,68,.5)";
+    var dt=g.date?new Date(g.date).toLocaleDateString():"";
+    return '<div style="background:rgba(30,41,59,.5);border-left:2px solid '+bc+';border-radius:8px;padding:10px 12px;margin-bottom:8px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+        '<span style="font-size:13px;font-weight:600;">'+esc(hp)+' <span style="color:#60a5fa;">'+hs+'</span> – <span style="color:#60a5fa;">'+as_+'</span> '+esc(ap)+'</span>' +
+        '<span style="font-size:11px;font-weight:700;">'+res+'</span>' +
+      '</div>' +
+      '<p style="font-size:11px;color:#475569;margin-top:4px;">'+dt+' · <span style="color:#4ade80;">✔ Admin Verified</span></p>' +
+    '</div>';
+  }).join("");
+}
+
+/* ---- RESET PASSWORD ---- */
+function openResetPassModal() {
+  if (!currentPanelPlayer || currentPanelType !== "free") return;
+  document.getElementById("resetPassName").innerText = currentPanelPlayer;
+  document.getElementById("newPassInput").value = "";
+  document.getElementById("resetPassModal").classList.add("open");
+  setTimeout(function(){ document.getElementById("newPassInput").focus(); }, 100);
+}
+
+function closeResetPassModal() {
+  document.getElementById("resetPassModal").classList.remove("open");
+}
+
+async function confirmResetPass() {
+  var newPass = document.getElementById("newPassInput").value.trim();
+  if (!newPass || newPass.length < 4) { toast("Password must be at least 4 characters", "err"); return; }
+  var r = await apPost({ action: "adminResetPassword", teamName: currentPanelPlayer, newPassword: newPass });
+  closeResetPassModal();
+  if (r.error) { toast("Error: " + r.error, "err"); return; }
+  toast("Password reset for " + currentPanelPlayer + " ✅", "ok");
 }
 
 /* ---- AUTO REFRESH ---- */
